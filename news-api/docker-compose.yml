@@ -1,0 +1,19 @@
+services:
+  data-fetcher:
+    build:
+      context: .
+      dockerfile: ./apps/data-fetcher/Dockerfile
+      target: development
+    container_name: data-fetcher
+    command: npm run start:dev data-fetcher
+    env_file:
+      - ./apps/data-fetcher/.env
+    volumes:
+      - /usr/src/app/node_modules
+    ports:
+      - '3000:3000'
+    develop:
+      watch:
+        - path: ./apps/data-fetcher
+          target: /usr/src/app/apps/data-fetcher
+          action: sync
