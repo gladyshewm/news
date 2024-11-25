@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { DataFetcherModule } from './../src/data-fetcher.module';
+import { DataFetcherModule } from '../src/data-fetcher/data-fetcher.module';
 
 describe('DataFetcherController (e2e)', () => {
   let app: INestApplication;

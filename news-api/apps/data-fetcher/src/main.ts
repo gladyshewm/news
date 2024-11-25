@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { DataFetcherModule } from './data-fetcher.module';
+import { DataFetcherModule } from './data-fetcher/data-fetcher.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(DataFetcherModule);

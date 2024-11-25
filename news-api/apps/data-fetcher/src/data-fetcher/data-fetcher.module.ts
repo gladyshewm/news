@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TrendingTopic } from './entities/trending-topic.entity';
+import { NewsApiModule } from '../news-api/news-api.module';
 
 @Module({
   imports: [
@@ -18,11 +19,14 @@ import { TrendingTopic } from './entities/trending-topic.entity';
         POSTGRES_USER: Joi.string().required(),
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DB: Joi.string().required(),
+        API_KEY: Joi.string().required(),
+        API_HOST: Joi.string().required(),
       }),
       envFilePath: './apps/data-fetcher/.env',
     }),
     DbModule,
     TypeOrmModule.forFeature([TrendingTopic]),
+    NewsApiModule,
   ],
   controllers: [DataFetcherController],
   providers: [DataFetcherService],
