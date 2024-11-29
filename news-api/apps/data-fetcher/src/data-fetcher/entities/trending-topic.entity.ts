@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Publisher } from './publisher.entity';
 
 @Entity()
 export class TrendingTopic {
@@ -22,6 +29,13 @@ export class TrendingTopic {
 
   @Column()
   contentLength: number;
+
+  @Column('text', { array: true })
+  authors: string[];
+
+  @OneToOne(() => Publisher, (publisher) => publisher.id, { cascade: true })
+  @JoinColumn()
+  publisher: Publisher;
 
   @Column()
   date: Date;

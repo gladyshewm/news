@@ -1,8 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { DataFetcherModule } from './data-fetcher/data-fetcher.module';
+import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(DataFetcherModule);
-  await app.listen(process.env.port ?? 3000);
+  app.useGlobalPipes(new ValidationPipe());
+
+  const configService = app.get(ConfigService);
+
+  await app.listen(configService.get('PORT') ?? 3000);
 }
 bootstrap();

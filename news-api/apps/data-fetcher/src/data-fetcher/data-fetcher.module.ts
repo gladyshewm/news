@@ -7,6 +7,8 @@ import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TrendingTopic } from './entities/trending-topic.entity';
 import { NewsApiModule } from '../news-api/news-api.module';
+import { Publisher } from './entities/publisher.entity';
+import { TrendingTopicRepository } from './trending-topic.repository';
 
 @Module({
   imports: [
@@ -25,10 +27,10 @@ import { NewsApiModule } from '../news-api/news-api.module';
       envFilePath: './apps/data-fetcher/.env',
     }),
     DbModule,
-    TypeOrmModule.forFeature([TrendingTopic]),
+    TypeOrmModule.forFeature([TrendingTopic, Publisher]),
     NewsApiModule,
   ],
   controllers: [DataFetcherController],
-  providers: [DataFetcherService],
+  providers: [DataFetcherService, TrendingTopicRepository],
 })
 export class DataFetcherModule {}

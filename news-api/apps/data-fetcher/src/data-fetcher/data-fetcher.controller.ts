@@ -14,9 +14,12 @@ export class DataFetcherController {
     @Query('topic') topic: string,
     @Query('language') language: string,
   ) {
-    return this.newsApiService.getTrendingTopics(
+    const topics = await this.newsApiService.getTrendingTopics(
       topic || 'General',
       language || 'en',
     );
+    await this.dataFetcherService.saveTopics(topics);
+
+    return topics;
   }
 }
