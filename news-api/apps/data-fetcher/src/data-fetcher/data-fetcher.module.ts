@@ -9,6 +9,8 @@ import { TrendingTopic } from './entities/trending-topic.entity';
 import { NewsApiModule } from '../news-api/news-api.module';
 import { Publisher } from './entities/publisher.entity';
 import { TrendingTopicRepository } from './trending-topic.repository';
+import { RmqModule } from '@app/rmq';
+import { DATA_FETCHER_SERVICE } from './constants/services';
 
 @Module({
   imports: [
@@ -21,12 +23,16 @@ import { TrendingTopicRepository } from './trending-topic.repository';
         POSTGRES_USER: Joi.string().required(),
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DB: Joi.string().required(),
+        RMQ_URI: Joi.string().required(),
+        RMQ_SEARCH_DELIVERY_QUEUE: Joi.string().required(),
+        RMQ_DATA_FETCHER_QUEUE: Joi.string().required(),
         API_KEY: Joi.string().required(),
         API_HOST: Joi.string().required(),
       }),
       envFilePath: './apps/data-fetcher/.env',
     }),
     DbModule,
+    RmqModule.register({ name: DATA_FETCHER_SERVICE }),
     TypeOrmModule.forFeature([TrendingTopic, Publisher]),
     NewsApiModule,
   ],
