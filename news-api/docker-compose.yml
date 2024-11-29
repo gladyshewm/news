@@ -22,6 +22,29 @@ services:
           target: /usr/src/app/apps/data-fetcher
           action: sync
 
+  search-delivery:
+    build:
+      context: .
+      dockerfile: ./apps/search-delivery/Dockerfile
+      target: development
+    container_name: search-delivery
+    depends_on:
+      - db
+    command: npm run start:dev search-delivery
+    env_file:
+      - ./apps/search-delivery/.env
+    volumes:
+      - /usr/src/app/node_modules
+    networks:
+      - app-network
+    ports:
+      - '3001:3001'
+    develop:
+      watch:
+        - path: ./apps/search-delivery
+          target: /usr/src/app/apps/search-delivery
+          action: sync
+
   db:
     image: postgres:alpine
     restart: always
@@ -38,10 +61,26 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  rmq:
+    image: rabbitmq:4-management-alpine
+    container_name: rmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    networks:
+      - app-network
+      - rmq_network
+
 volumes:
   pgdata:
     driver: local
 
 networks:
   app-network:
+    driver: bridge
+
+  rmq_network:
     driver: bridge
