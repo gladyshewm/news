@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { NewsApiService } from './news-api.service';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RedisModule } from '@app/redis';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
       inject: [ConfigService],
     }),
+    RedisModule,
   ],
   controllers: [],
   providers: [NewsApiService],
