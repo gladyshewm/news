@@ -41,6 +41,9 @@ export class TrendingTopicDto {
   @IsString({ each: true })
   authors: string[];
 
+  @IsString({ each: true })
+  keywords: string[];
+
   publisher: Publisher;
 
   @IsDate()

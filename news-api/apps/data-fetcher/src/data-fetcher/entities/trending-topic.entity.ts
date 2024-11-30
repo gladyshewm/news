@@ -30,8 +30,11 @@ export class TrendingTopic {
   @Column()
   contentLength: number;
 
-  @Column('text', { array: true })
+  @Column('text', { array: true, default: [] })
   authors: string[];
+
+  @Column('text', { array: true, default: [] })
+  keywords: string[];
 
   @OneToOne(() => Publisher, (publisher) => publisher.id, { cascade: true })
   @JoinColumn()
