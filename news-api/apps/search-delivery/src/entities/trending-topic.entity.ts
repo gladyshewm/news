@@ -1,0 +1,42 @@
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Publisher } from './publisher.entity';
+
+@Entity()
+export class TrendingTopic {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  title: string;
+
+  @Column()
+  url: string;
+
+  @Column()
+  excerpt: string;
+
+  @Column()
+  thumbnail: string;
+
+  @Column()
+  language: string;
+
+  @Column()
+  contentLength: number;
+
+  @Column('text', { array: true })
+  authors: string[];
+
+  @OneToOne(() => Publisher, (publisher) => publisher.id, { cascade: true })
+  @JoinColumn()
+  publisher: Publisher;
+
+  @Column()
+  date: Date;
+}
