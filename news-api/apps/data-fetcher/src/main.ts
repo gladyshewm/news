@@ -3,7 +3,7 @@ import { DataFetcherModule } from './data-fetcher/data-fetcher.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RmqService } from '@app/rmq';
-import { DATA_FETCHER_SERVICE } from './data-fetcher/constants/services';
+import { DATA_FETCHER_SERVICE } from './constants/services';
 
 async function bootstrap() {
   const app = await NestFactory.create(DataFetcherModule);

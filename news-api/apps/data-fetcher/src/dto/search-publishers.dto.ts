@@ -50,3 +50,17 @@ export class SearchPublishersResponseDto {
   @Type(() => SearchPublishersDto)
   data: SearchPublishersDto[];
 }
+
+export class SearchPublishersPayload {
+  @IsString()
+  query: string;
+
+  @IsString()
+  country: string;
+
+  @IsString()
+  language: string;
+
+  @IsString()
+  category: string;
+}

@@ -9,17 +9,21 @@ import {
 import {
   TrendingTopicDto,
   TrendingTopicsResponseDto,
-} from '../data-fetcher/dto/trending-topic.dto';
+} from '../dto/trending-topic.dto';
 import {
   SearchPublishersDto,
+  SearchPublishersPayload,
   SearchPublishersResponseDto,
-} from '../data-fetcher/dto/search-publishers.dto';
+} from '../dto/search-publishers.dto';
 import {
   SearchArticlesDto,
+  SearchArticlesPayload,
   SearchArticlesResponseDto,
-} from '../data-fetcher/dto/search-articles.dto';
+} from '../dto/search-articles.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { RmqContext } from '@nestjs/microservices';
+import { RmqService } from '@app/rmq';
 
 @Injectable()
 export class NewsApiService {
@@ -28,6 +32,7 @@ export class NewsApiService {
   constructor(
     private readonly httpService: HttpService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getTrendingTopics(
@@ -58,17 +63,16 @@ export class NewsApiService {
   }
 
   async searchArticles(
-    query: string,
-    language: string,
+    payload: SearchArticlesPayload,
+    context: RmqContext,
   ): Promise<SearchArticlesDto[]> {
     try {
+      const { query, language } = payload;
       const cachedArticles = await this.cacheManager.get<SearchArticlesDto[]>(
         query + language,
       );
 
-      if (cachedArticles) {
-        return cachedArticles;
-      }
+      if (cachedArticles) return cachedArticles;
 
       const {
         data: { data: articles },
@@ -82,7 +86,7 @@ export class NewsApiService {
         },
       );
 
-      await this.cacheManager.set(query, articles, 1000 * 60 * 15);
+      await this.cacheManager.set(query + language, articles, 1000 * 60 * 15);
 
       return articles;
     } catch (error) {
@@ -91,23 +95,22 @@ export class NewsApiService {
         `Failed to fetch search articles: ${error.message}`,
         HttpStatus.BAD_REQUEST,
       );
+    } finally {
+      this.rmqService.ack(context);
     }
   }
 
   async searchPublishers(
-    query: string,
-    country: string,
-    language: string,
-    category: string,
+    payload: SearchPublishersPayload,
+    context: RmqContext,
   ): Promise<SearchPublishersDto[]> {
     try {
+      const { query, country, language, category } = payload;
       const cachedPublishers = await this.cacheManager.get<
         SearchPublishersDto[]
       >(query + country + language + category);
 
-      if (cachedPublishers) {
-        return cachedPublishers;
-      }
+      if (cachedPublishers) return cachedPublishers;
 
       const {
         data: { data: publishers },
@@ -123,7 +126,11 @@ export class NewsApiService {
         },
       );
 
-      await this.cacheManager.set(query, publishers, 1000 * 60 * 15);
+      await this.cacheManager.set(
+        query + country + language + category,
+        publishers,
+        1000 * 60 * 15,
+      );
 
       return publishers;
     } catch (error) {
@@ -132,6 +139,8 @@ export class NewsApiService {
         `Failed to fetch search publishers: ${error.message}`,
         HttpStatus.BAD_REQUEST,
       );
+    } finally {
+      this.rmqService.ack(context);
     }
   }
 }

@@ -19,4 +19,27 @@ export class SearchDeliveryController {
       sort,
     );
   }
+
+  @Get('search/articles')
+  async searchArticles(
+    @Query('query') query: string,
+    @Query('language') language: string = 'ru',
+  ) {
+    return this.searchDeliveryService.searchArticles(query, language);
+  }
+
+  @Get('search/publishers')
+  async searchPublishers(
+    @Query('query') query: string,
+    @Query('country') country: string = '',
+    @Query('language') language: string = '',
+    @Query('category') category: string = '',
+  ) {
+    return this.searchDeliveryService.searchPublishers(
+      query,
+      country,
+      language,
+      category,
+    );
+  }
 }

@@ -1,6 +1,14 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { DataFetcherService } from './data-fetcher.service';
 import { NewsApiService } from '../news-api/news-api.service';
+import {
+  Ctx,
+  MessagePattern,
+  Payload,
+  RmqContext,
+} from '@nestjs/microservices';
+import { SearchPublishersPayload } from '../dto/search-publishers.dto';
+import { SearchArticlesPayload } from '../dto/search-articles.dto';
 
 @Controller('data-fetcher')
 export class DataFetcherController {
@@ -20,26 +28,19 @@ export class DataFetcherController {
     return topics;
   }
 
-  @Get('search/articles')
+  @MessagePattern('search_articles')
   async searchArticles(
-    @Query('query') query: string,
-    @Query('language') language: string = 'ru',
+    @Payload() payload: SearchArticlesPayload,
+    @Ctx() context: RmqContext,
   ) {
-    return this.newsApiService.searchArticles(query, language);
+    return this.newsApiService.searchArticles(payload, context);
   }
 
-  @Get('search/publishers')
+  @MessagePattern('search_publishers')
   async searchPublishers(
-    @Query('query') query: string,
-    @Query('country') country: string = '',
-    @Query('language') language: string = '',
-    @Query('category') category: string = '',
+    @Payload() payload: SearchPublishersPayload,
+    @Ctx() context: RmqContext,
   ) {
-    return this.newsApiService.searchPublishers(
-      query,
-      country,
-      language,
-      category,
-    );
+    return this.newsApiService.searchPublishers(payload, context);
   }
 }

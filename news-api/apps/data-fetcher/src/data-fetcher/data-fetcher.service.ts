@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TrendingTopicDto } from './dto/trending-topic.dto';
+import { TrendingTopicDto } from '../dto/trending-topic.dto';
 import { TrendingTopicRepository } from './trending-topic.repository';
 
 @Injectable()

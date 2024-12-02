@@ -4,7 +4,10 @@ import { SearchDeliveryService } from './search-delivery.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { RmqModule } from '@app/rmq';
-import { SEARCH_DELIVERY_SERVICE } from './constants/services';
+import {
+  DATA_FETCHER_SERVICE,
+  SEARCH_DELIVERY_SERVICE,
+} from './constants/services';
 import { DbModule } from '@app/db';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TrendingTopic } from './entities/trending-topic.entity';
@@ -28,6 +31,7 @@ import { Publisher } from './entities/publisher.entity';
       envFilePath: './apps/search-delivery/.env',
     }),
     RmqModule.register({ name: SEARCH_DELIVERY_SERVICE }),
+    RmqModule.register({ name: DATA_FETCHER_SERVICE }),
     DbModule,
     TypeOrmModule.forFeature([TrendingTopic, Publisher]),
   ],

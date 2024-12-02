@@ -10,7 +10,7 @@ import { NewsApiModule } from '../news-api/news-api.module';
 import { Publisher } from './entities/publisher.entity';
 import { TrendingTopicRepository } from './trending-topic.repository';
 import { RmqModule } from '@app/rmq';
-import { DATA_FETCHER_SERVICE } from './constants/services';
+import { DATA_FETCHER_SERVICE } from '../constants/services';
 
 @Module({
   imports: [

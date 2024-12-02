@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TrendingTopic } from './entities/trending-topic.entity';
 import { Repository } from 'typeorm';
-import { TrendingTopicDto } from './dto/trending-topic.dto';
+import { TrendingTopicDto } from '../dto/trending-topic.dto';
 
 @Injectable()
 export class TrendingTopicRepository {

@@ -3,6 +3,8 @@ import { NewsApiService } from './news-api.service';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisModule } from '@app/redis';
+import { RmqModule } from '@app/rmq';
+import { SEARCH_DELIVERY_SERVICE } from '../constants/services';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { RedisModule } from '@app/redis';
       inject: [ConfigService],
     }),
     RedisModule,
+    RmqModule.register({ name: SEARCH_DELIVERY_SERVICE }),
   ],
   controllers: [],
   providers: [NewsApiService],
