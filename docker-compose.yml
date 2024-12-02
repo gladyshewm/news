@@ -1,15 +1,34 @@
 services:
+  client:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: client
+    ports:
+      - '5000:5000'
+    networks:
+      - app-network
+    env_file:
+      - ./client/.env
+    develop:
+      watch:
+        - path: ./client/src
+          target: /usr/src/app/src
+          action: sync
+
   data-fetcher:
     build:
-      context: .
-      dockerfile: ./apps/data-fetcher/Dockerfile
+      context: ./news-api
+      dockerfile: apps/data-fetcher/Dockerfile
       target: development
     container_name: data-fetcher
     depends_on:
       - db
+      - rmq
+      - redis
     command: npm run start:dev data-fetcher
     env_file:
-      - ./apps/data-fetcher/.env
+      - ./news-api/apps/data-fetcher/.env
     volumes:
       - /usr/src/app/node_modules
     networks:
@@ -18,21 +37,23 @@ services:
       - '3000:3000'
     develop:
       watch:
-        - path: ./apps/data-fetcher
+        - path: ./news-api/apps/data-fetcher
           target: /usr/src/app/apps/data-fetcher
           action: sync
 
   search-delivery:
     build:
-      context: .
-      dockerfile: ./apps/search-delivery/Dockerfile
+      context: ./news-api
+      dockerfile: apps/search-delivery/Dockerfile
       target: development
     container_name: search-delivery
     depends_on:
       - db
+      - rmq
+      - redis
     command: npm run start:dev search-delivery
     env_file:
-      - ./apps/search-delivery/.env
+      - ./news-api/apps/search-delivery/.env
     volumes:
       - /usr/src/app/node_modules
     networks:
@@ -41,7 +62,7 @@ services:
       - '3001:3001'
     develop:
       watch:
-        - path: ./apps/search-delivery
+        - path: ./news-api/apps/search-delivery
           target: /usr/src/app/apps/search-delivery
           action: sync
 
