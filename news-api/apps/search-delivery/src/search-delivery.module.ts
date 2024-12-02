@@ -12,6 +12,7 @@ import { DbModule } from '@app/db';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TrendingTopic } from './entities/trending-topic.entity';
 import { Publisher } from './entities/publisher.entity';
+import { RedisModule } from '@app/redis';
 
 @Module({
   imports: [
@@ -27,6 +28,8 @@ import { Publisher } from './entities/publisher.entity';
         RMQ_URI: Joi.string().required(),
         RMQ_SEARCH_DELIVERY_QUEUE: Joi.string().required(),
         RMQ_DATA_FETCHER_QUEUE: Joi.string().required(),
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.number().required(),
       }),
       envFilePath: './apps/search-delivery/.env',
     }),
@@ -34,6 +37,7 @@ import { Publisher } from './entities/publisher.entity';
     RmqModule.register({ name: DATA_FETCHER_SERVICE }),
     DbModule,
     TypeOrmModule.forFeature([TrendingTopic, Publisher]),
+    RedisModule,
   ],
   controllers: [SearchDeliveryController],
   providers: [SearchDeliveryService],

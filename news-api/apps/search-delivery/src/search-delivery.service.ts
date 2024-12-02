@@ -8,6 +8,8 @@ import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { SearchArticlesDto } from './dto/search-articles.dto';
 import { SearchPublishersDto } from './dto/search-publishers.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class SearchDeliveryService {
@@ -18,7 +20,29 @@ export class SearchDeliveryService {
     private readonly trendingTopicRepo: Repository<TrendingTopic>,
     @Inject(DATA_FETCHER_SERVICE)
     private readonly dataFetcherClient: ClientProxy,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+
+  private getCacheKeyTrendingTopics = (
+    language: string,
+    page: number,
+    limit: number,
+    sort: string,
+  ) => `trendingTopics:${language}-${page}-${limit}-${sort}`;
+
+  private async getTrendingTopicsFromCache(
+    cacheKey: string,
+  ): Promise<TrendingTopicsDBResponseDto | null> {
+    try {
+      return (
+        (await this.cacheManager.get<TrendingTopicsDBResponseDto>(cacheKey)) ||
+        null
+      );
+    } catch (error) {
+      this.logger.warn(`Cache error: ${error.message}`);
+      return null;
+    }
+  }
 
   async getTrendingTopics(
     language: string,
@@ -26,6 +50,16 @@ export class SearchDeliveryService {
     limit: number,
     sort: string,
   ): Promise<TrendingTopicsDBResponseDto> {
+    const cacheKey = this.getCacheKeyTrendingTopics(
+      language,
+      page,
+      limit,
+      sort,
+    );
+
+    const cachedResponse = await this.getTrendingTopicsFromCache(cacheKey);
+    if (cachedResponse) return cachedResponse;
+
     try {
       const [topics, count] = await this.trendingTopicRepo.findAndCount({
         where: { language },
@@ -35,12 +69,16 @@ export class SearchDeliveryService {
         relations: ['publisher'],
       });
 
-      return {
+      const result = {
         data: topics,
         total: count,
         page,
         pages: Math.ceil(count / limit),
       };
+
+      await this.cacheManager.set(cacheKey, result, 1000 * 60 * 15);
+
+      return result;
     } catch (error) {
       this.logger.error(`Failed to fetch trending topics: ${error.message}`);
       throw new Error(`Failed to fetch trending topics: ${error.message}`);

@@ -62,18 +62,33 @@ export class NewsApiService {
     }
   }
 
+  private getCacheKeySearchArticles = (query: string, language: string) =>
+    `searchArticles:${query}-${language}`;
+
+  private async getArticlesFromCache(
+    cacheKey: string,
+  ): Promise<SearchArticlesDto[] | null> {
+    try {
+      return (
+        (await this.cacheManager.get<SearchArticlesDto[]>(cacheKey)) || null
+      );
+    } catch (error) {
+      this.logger.warn(`Cache error: ${error.message}`);
+      return null;
+    }
+  }
+
   async searchArticles(
     payload: SearchArticlesPayload,
     context: RmqContext,
   ): Promise<SearchArticlesDto[]> {
+    const { query, language } = payload;
+    const cacheKey = this.getCacheKeySearchArticles(query, language);
+
+    const cachedArticles = await this.getArticlesFromCache(cacheKey);
+    if (cachedArticles) return cachedArticles;
+
     try {
-      const { query, language } = payload;
-      const cachedArticles = await this.cacheManager.get<SearchArticlesDto[]>(
-        query + language,
-      );
-
-      if (cachedArticles) return cachedArticles;
-
       const {
         data: { data: articles },
       } = await this.httpService.axiosRef.get<SearchArticlesResponseDto>(
@@ -86,7 +101,7 @@ export class NewsApiService {
         },
       );
 
-      await this.cacheManager.set(query + language, articles, 1000 * 60 * 15);
+      await this.cacheManager.set(cacheKey, articles, 1000 * 60 * 15);
 
       return articles;
     } catch (error) {
@@ -100,18 +115,42 @@ export class NewsApiService {
     }
   }
 
+  private getCacheKeySearchPublishers = (
+    query: string,
+    language: string,
+    country: string,
+    category: string,
+  ) => `searchPublishers:${query}-${country}-${language}-${category}`;
+
+  private async getPublishersFromCache(
+    cacheKey: string,
+  ): Promise<SearchPublishersDto[] | null> {
+    try {
+      return (
+        (await this.cacheManager.get<SearchPublishersDto[]>(cacheKey)) || null
+      );
+    } catch (error) {
+      this.logger.warn(`Cache error: ${error.message}`);
+      return null;
+    }
+  }
+
   async searchPublishers(
     payload: SearchPublishersPayload,
     context: RmqContext,
   ): Promise<SearchPublishersDto[]> {
+    const { query, country, language, category } = payload;
+    const cacheKey = this.getCacheKeySearchPublishers(
+      query,
+      language,
+      country,
+      category,
+    );
+
+    const cachedPublishers = await this.getPublishersFromCache(cacheKey);
+    if (cachedPublishers) return cachedPublishers;
+
     try {
-      const { query, country, language, category } = payload;
-      const cachedPublishers = await this.cacheManager.get<
-        SearchPublishersDto[]
-      >(query + country + language + category);
-
-      if (cachedPublishers) return cachedPublishers;
-
       const {
         data: { data: publishers },
       } = await this.httpService.axiosRef.get<SearchPublishersResponseDto>(
@@ -126,11 +165,7 @@ export class NewsApiService {
         },
       );
 
-      await this.cacheManager.set(
-        query + country + language + category,
-        publishers,
-        1000 * 60 * 15,
-      );
+      await this.cacheManager.set(cacheKey, publishers, 1000 * 60 * 15);
 
       return publishers;
     } catch (error) {
