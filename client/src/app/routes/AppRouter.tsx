@@ -4,7 +4,7 @@ import {
   RouteObject,
   RouterProvider,
 } from 'react-router-dom';
-import HomePage from '../../pages/HomePage';
+import HomePage from '../../pages/HomePage/HomePage';
 import AppLayout from '../../layouts/AppLayout/AppLayout';
 
 const AppRouter = () => {
