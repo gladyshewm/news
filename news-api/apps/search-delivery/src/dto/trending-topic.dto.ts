@@ -11,6 +11,7 @@ export class Publisher {
   favicon: string;
 }
 
+// TODO: id
 export class TrendingTopicDto {
   @IsString()
   title: string;
@@ -32,6 +33,9 @@ export class TrendingTopicDto {
 
   @IsString({ each: true })
   authors: string[];
+
+  @IsString({ each: true })
+  keywords: string[];
 
   publisher: Publisher;
 

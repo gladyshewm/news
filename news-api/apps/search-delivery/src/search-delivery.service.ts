@@ -57,8 +57,8 @@ export class SearchDeliveryService {
       sort,
     );
 
-    const cachedResponse = await this.getTrendingTopicsFromCache(cacheKey);
-    if (cachedResponse) return cachedResponse;
+    // const cachedResponse = await this.getTrendingTopicsFromCache(cacheKey);
+    // if (cachedResponse) return cachedResponse;
 
     try {
       const [topics, count] = await this.trendingTopicRepo.findAndCount({
