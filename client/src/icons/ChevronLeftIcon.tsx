@@ -1,4 +1,6 @@
-export function ChevronLeftIcon({ ...props }) {
+import { SVGAttributes } from 'react';
+
+export function ChevronLeftIcon(props: SVGAttributes<SVGElement>) {
   return (
     <svg
       fill="none"

@@ -11,7 +11,7 @@ const HomePage = () => {
 
   useEffect(() => {
     searchService
-      .getTrendingTopics('en', 1, 5, 'date')
+      .getTrendingTopics('ru', 1, 5, 'date')
       .then((data) => setTopics(data))
       .then(() => setIsLoading(false));
   }, []);

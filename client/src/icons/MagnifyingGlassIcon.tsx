@@ -1,4 +1,6 @@
-export function MagnifyingGlassIcon({ ...props }) {
+import { SVGAttributes } from 'react';
+
+export function MagnifyingGlassIcon(props: SVGAttributes<SVGElement>) {
   return (
     <svg
       fill="none"
