@@ -11,8 +11,10 @@ export class Publisher {
   favicon: string;
 }
 
-// TODO: id
 export class TrendingTopicDto {
+  @IsString()
+  topicId: string;
+
   @IsString()
   title: string;
 

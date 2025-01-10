@@ -9,6 +9,7 @@ import {
 } from '@nestjs/microservices';
 import { SearchPublishersPayload } from '../dto/search-publishers.dto';
 import { SearchArticlesPayload } from '../dto/search-articles.dto';
+import { SupportedTopicsDto } from '../dto/supported-topics.dto';
 
 @Controller('data-fetcher')
 export class DataFetcherController {
@@ -19,7 +20,7 @@ export class DataFetcherController {
 
   @Get('trending-topics')
   async getTrendingTopics(
-    @Query('topic') topic: string = 'General',
+    @Query('topic') topic: SupportedTopicsDto = 'General',
     @Query('language') language: string = 'ru',
   ) {
     const topics = await this.newsApiService.getTrendingTopics(topic, language);

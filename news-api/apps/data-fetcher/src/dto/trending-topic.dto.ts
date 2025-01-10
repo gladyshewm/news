@@ -21,6 +21,9 @@ export class Publisher {
 
 export class TrendingTopicDto {
   @IsString()
+  topicId: string;
+
+  @IsString()
   title: string;
 
   @IsUrl()

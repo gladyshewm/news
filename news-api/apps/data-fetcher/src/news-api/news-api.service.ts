@@ -24,6 +24,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { RmqContext } from '@nestjs/microservices';
 import { RmqService } from '@app/rmq';
+import { SupportedTopicsDto } from '../dto/supported-topics.dto';
 
 @Injectable()
 export class NewsApiService {
@@ -36,7 +37,7 @@ export class NewsApiService {
   ) {}
 
   async getTrendingTopics(
-    topic: string,
+    topic: SupportedTopicsDto,
     language: string,
   ): Promise<TrendingTopicDto[]> {
     try {
@@ -51,6 +52,7 @@ export class NewsApiService {
           },
         },
       );
+      topics.forEach((t) => (t.topicId = topic));
 
       return topics;
     } catch (error) {

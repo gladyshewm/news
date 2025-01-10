@@ -13,6 +13,9 @@ export class TrendingTopic {
   id: number;
 
   @Column()
+  topicId: string;
+
+  @Column()
   title: string;
 
   @Column()

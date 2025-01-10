@@ -10,6 +10,7 @@ import { SearchArticlesDto } from './dto/search-articles.dto';
 import { SearchPublishersDto } from './dto/search-publishers.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { SupportedTopicsDto } from './dto/supported-topics.dto';
 
 @Injectable()
 export class SearchDeliveryService {
@@ -25,10 +26,11 @@ export class SearchDeliveryService {
 
   private getCacheKeyTrendingTopics = (
     language: string,
+    topic: SupportedTopicsDto,
     page: number,
     limit: number,
     sort: string,
-  ) => `trendingTopics:${language}-${page}-${limit}-${sort}`;
+  ) => `trendingTopics:${language}-${topic}-${page}-${limit}-${sort}`;
 
   private async getTrendingTopicsFromCache(
     cacheKey: string,
@@ -46,12 +48,14 @@ export class SearchDeliveryService {
 
   async getTrendingTopics(
     language: string,
+    topic: SupportedTopicsDto,
     page: number,
     limit: number,
     sort: string,
   ): Promise<TrendingTopicsDBResponseDto> {
     const cacheKey = this.getCacheKeyTrendingTopics(
       language,
+      topic,
       page,
       limit,
       sort,
@@ -62,7 +66,7 @@ export class SearchDeliveryService {
 
     try {
       const [topics, count] = await this.trendingTopicRepo.findAndCount({
-        where: { language },
+        where: { language, topicId: topic },
         order: { [sort]: 'DESC' },
         skip: (page - 1) * limit,
         take: limit,
