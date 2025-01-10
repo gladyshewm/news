@@ -1,4 +1,4 @@
-import { Topic } from '../types';
+import { SupportedTopics, Topic } from '../types';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
@@ -10,14 +10,15 @@ class SearchService {
   }
 
   async getTrendingTopics(
-    language: string = 'ru',
+    language: string,
+    topic: SupportedTopics,
     page: number = 1,
     limit: number = 10,
     sort: string = 'date',
   ): Promise<Topic[]> {
     try {
       const response = await fetch(
-        `${this.baseUrl}/search-delivery/trending-topics?language=${language}&page=${page}&limit=${limit}&sort=${sort}`,
+        `${this.baseUrl}/search-delivery/trending-topics?language=${language}&topic=${topic}&page=${page}&limit=${limit}&sort=${sort}`,
       );
       const { data: topics }: { data: Topic[] } = await response.json();
       return topics;

@@ -5,6 +5,7 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import HomePage from '../../pages/HomePage/HomePage';
+import TopicPage from '../../pages/TopicPage/TopicPage';
 import AppLayout from '../../layouts/AppLayout/AppLayout';
 
 const AppRouter = () => {
@@ -15,6 +16,10 @@ const AppRouter = () => {
         {
           index: true,
           element: <HomePage />,
+        },
+        {
+          path: ':topic',
+          element: <TopicPage />,
         },
       ],
     },

@@ -8,10 +8,11 @@
   height: 4.5rem;
   padding: 0 1rem;
 
-  & h1 {
+  & .logo {
+    cursor: pointer;
+    text-decoration: none;
     color: var(--main-background-color);
     font-size: 2rem;
-    cursor: pointer;
   }
 
   & .nav-links {
@@ -21,7 +22,8 @@
     margin: 0 2rem;
     height: 100%;
 
-    & li {
+    & li a {
+      text-decoration: none;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -34,6 +36,10 @@
       transition: all 0.2s ease;
 
       &:hover {
+        color: #b8b8b8;
+      }
+
+      &.active {
         color: #b8b8b8;
       }
     }

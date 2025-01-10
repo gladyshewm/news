@@ -1,3 +1,5 @@
+import { SupportedTopics } from './supported-topics';
+
 export type Publisher = {
   name: string;
   url: string;
@@ -6,6 +8,7 @@ export type Publisher = {
 
 export type Topic = {
   id: number;
+  topicId: SupportedTopics;
   title: string;
   url: string;
   excerpt: string;

@@ -1,0 +1,11 @@
+.topic-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 4.5rem);
+  overflow: auto hidden;
+  padding: 1rem;
+
+  & .trending-topics {
+    margin-top: 1.5rem;
+  }
+}

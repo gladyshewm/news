@@ -30,14 +30,20 @@
 
     & .main-topic__content {
       background-color: #e5e6e3;
+      opacity: 0.9;
       z-index: 1;
       position: absolute;
       display: flex;
       flex-direction: column;
       left: 0.5rem;
-      min-height: 25rem;
+      height: 28rem;
       width: 25rem;
       border-radius: 0.8rem;
+      transition: all 0.3s ease;
+
+      &:hover {
+        opacity: 1;
+      }
 
       & header {
         display: flex;
@@ -77,6 +83,7 @@
         flex-direction: column;
         justify-content: flex-start;
         padding: 0 1.8rem;
+        height: 100%;
 
         & .title {
           margin-bottom: 1.6rem;
