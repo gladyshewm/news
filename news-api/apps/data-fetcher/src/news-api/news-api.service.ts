@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import {
   TrendingTopicDto,
+  TrendingTopicsPayload,
   TrendingTopicsResponseDto,
 } from '../dto/trending-topic.dto';
 import {
@@ -61,6 +62,25 @@ export class NewsApiService {
         `Failed to fetch trending topics: ${error.message}`,
         HttpStatus.BAD_REQUEST,
       );
+    }
+  }
+
+  async trendingTopics(
+    payload: TrendingTopicsPayload,
+    context: RmqContext,
+  ): Promise<TrendingTopicDto[]> {
+    const { topic, language } = payload;
+    try {
+      const topics = await this.getTrendingTopics(topic, language);
+      return topics;
+    } catch (error) {
+      this.logger.error(`Failed to fetch trending topics: ${error.message}`);
+      throw new HttpException(
+        `Failed to fetch trending topics: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } finally {
+      this.rmqService.ack(context);
     }
   }
 

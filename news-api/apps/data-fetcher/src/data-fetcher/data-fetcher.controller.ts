@@ -10,6 +10,7 @@ import {
 import { SearchPublishersPayload } from '../dto/search-publishers.dto';
 import { SearchArticlesPayload } from '../dto/search-articles.dto';
 import { SupportedTopicsDto } from '../dto/supported-topics.dto';
+import { TrendingTopicsPayload } from '../dto/trending-topic.dto';
 
 @Controller('data-fetcher')
 export class DataFetcherController {
@@ -27,6 +28,21 @@ export class DataFetcherController {
     await this.dataFetcherService.saveTopics(topics);
 
     return topics;
+  }
+
+  @MessagePattern('trending_topics')
+  async trendingTopics(
+    @Payload() payload: TrendingTopicsPayload,
+    @Ctx() context: RmqContext,
+  ) {
+    try {
+      const topics = await this.newsApiService.trendingTopics(payload, context);
+      await this.dataFetcherService.saveTopics(topics);
+
+      return { success: true, data: topics };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   }
 
   @MessagePattern('search_articles')

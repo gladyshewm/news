@@ -7,6 +7,7 @@ import {
   IsUrl,
   ValidateNested,
 } from 'class-validator';
+import { SupportedTopicsDto } from './supported-topics.dto';
 
 export class Publisher {
   @IsString()
@@ -78,4 +79,12 @@ export class TrendingTopicsResponseDto {
   @ValidateNested({ each: true })
   @Type(() => TrendingTopicDto)
   data: TrendingTopicDto[];
+}
+
+export class TrendingTopicsPayload {
+  @IsString()
+  topic: SupportedTopicsDto;
+
+  @IsString()
+  language: string;
 }

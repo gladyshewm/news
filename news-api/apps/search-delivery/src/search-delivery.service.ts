@@ -73,6 +73,32 @@ export class SearchDeliveryService {
         relations: ['publisher'],
       });
 
+      if (count === 0) {
+        await lastValueFrom(
+          this.dataFetcherClient.send('trending_topics', {
+            language,
+            topic,
+          }),
+        );
+
+        const [newTopics, newCount] = await this.trendingTopicRepo.findAndCount(
+          {
+            where: { language, topicId: topic },
+            order: { [sort]: 'DESC' },
+            skip: (page - 1) * limit,
+            take: limit,
+            relations: ['publisher'],
+          },
+        );
+
+        return {
+          data: newTopics,
+          total: newCount,
+          page,
+          pages: Math.ceil(newCount / limit),
+        };
+      }
+
       const result = {
         data: topics,
         total: count,
