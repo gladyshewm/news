@@ -31,7 +31,7 @@ describe('SearchDeliveryController', () => {
     });
   });
 
-  describe('getTrendingTopics', () => {
+  describe('trendingTopics', () => {
     let trendingTopics: TrendingTopicsDBResponseDto;
     const topicId = 'Sports';
     const language = 'en';
@@ -39,15 +39,15 @@ describe('SearchDeliveryController', () => {
       {} as TrendingTopicsDBResponseDto;
 
     beforeEach(async () => {
-      searchDeliveryService.getTrendingTopics.mockResolvedValue(topics);
-      trendingTopics = await searchDeliveryController.getTrendingTopics(
+      searchDeliveryService.trendingTopics.mockResolvedValue(topics);
+      trendingTopics = await searchDeliveryController.trendingTopics(
         language,
         topicId,
       );
     });
 
-    it('should call searchDeliveryService.getTrendingTopics', () => {
-      expect(searchDeliveryService.getTrendingTopics).toHaveBeenCalledWith(
+    it('should call searchDeliveryService.trendingTopics', () => {
+      expect(searchDeliveryService.trendingTopics).toHaveBeenCalledWith(
         language,
         topicId,
         1,
@@ -60,11 +60,11 @@ describe('SearchDeliveryController', () => {
       expect(trendingTopics).toEqual(topics);
     });
 
-    it('should throw an error if searchDeliveryService.getTrendingTopics throws an error', async () => {
-      searchDeliveryService.getTrendingTopics.mockRejectedValue(new Error());
-      await expect(
-        searchDeliveryController.getTrendingTopics(),
-      ).rejects.toThrow(Error);
+    it('should throw an error if searchDeliveryService.trendingTopics throws an error', async () => {
+      searchDeliveryService.trendingTopics.mockRejectedValue(new Error());
+      await expect(searchDeliveryController.trendingTopics()).rejects.toThrow(
+        Error,
+      );
     });
   });
 

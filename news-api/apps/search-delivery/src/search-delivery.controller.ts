@@ -2,19 +2,21 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { SearchDeliveryService } from './search-delivery.service';
 import { SupportedTopicsDto } from './dto/supported-topics.dto';
 
+// TODO: добавить CRON-задачи
+
 @Controller('search-delivery')
 export class SearchDeliveryController {
   constructor(private readonly searchDeliveryService: SearchDeliveryService) {}
 
   @Get('trending-topics')
-  async getTrendingTopics(
+  async trendingTopics(
     @Query('language') language: string = 'ru',
     @Query('topic') topic: SupportedTopicsDto = 'General',
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('sort') sort: string = 'date',
   ) {
-    return this.searchDeliveryService.getTrendingTopics(
+    return this.searchDeliveryService.trendingTopics(
       language,
       topic,
       page,

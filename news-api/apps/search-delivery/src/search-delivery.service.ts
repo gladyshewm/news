@@ -46,7 +46,7 @@ export class SearchDeliveryService {
     }
   }
 
-  async getTrendingTopics(
+  async trendingTopics(
     language: string,
     topic: SupportedTopicsDto,
     page: number,
@@ -91,12 +91,16 @@ export class SearchDeliveryService {
           },
         );
 
-        return {
+        const result = {
           data: newTopics,
           total: newCount,
           page,
           pages: Math.ceil(newCount / limit),
         };
+
+        await this.cacheManager.set(cacheKey, result, 1000 * 60 * 15);
+
+        return result;
       }
 
       const result = {
@@ -115,6 +119,7 @@ export class SearchDeliveryService {
     }
   }
 
+  // TODO: обращаться сначала к репо перед data fetcher
   async searchArticles(
     query: string,
     language: string,
