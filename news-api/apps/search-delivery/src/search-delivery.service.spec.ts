@@ -11,6 +11,7 @@ import { TrendingTopicsDBResponseDto } from './dto/trending-topics-db-res.dto';
 import { of } from 'rxjs';
 import { SearchArticlesDto } from './dto/search-articles.dto';
 import { SearchPublishersDto } from './dto/search-publishers.dto';
+import { DataFetcherResponseDto } from './dto/data-fetcher-response.dto';
 
 describe('SearchDeliveryService', () => {
   let searchDeliveryService: SearchDeliveryService;
@@ -264,7 +265,9 @@ describe('SearchDeliveryService', () => {
 
   describe('searchArticles', () => {
     let result: SearchArticlesDto[];
-    const articles: SearchArticlesDto[] = [];
+    const articles = { success: true, data: [] } as DataFetcherResponseDto<
+      SearchArticlesDto[]
+    >;
     const query = 'query';
     const language = 'en';
 
@@ -281,7 +284,13 @@ describe('SearchDeliveryService', () => {
     });
 
     it('should return articles', () => {
-      expect(result).toEqual(articles);
+      expect(result).toEqual(articles.data);
+    });
+
+    it('should return empty array if dataFetcherClient.send returns status false', async () => {
+      articles.success = false;
+      result = await searchDeliveryService.searchArticles(query, language);
+      expect(result).toEqual([]);
     });
 
     it('should throw an error if dataFetcherClient.send throws an error', async () => {
@@ -296,7 +305,9 @@ describe('SearchDeliveryService', () => {
 
   describe('searchPublishers', () => {
     let result: SearchPublishersDto[];
-    const publishers: SearchPublishersDto[] = [];
+    const publishers = { success: true, data: [] } as DataFetcherResponseDto<
+      SearchPublishersDto[]
+    >;
     const query = 'query';
     const country = 'country';
     const language = 'en';
@@ -320,7 +331,18 @@ describe('SearchDeliveryService', () => {
     });
 
     it('should return publishers', () => {
-      expect(result).toEqual(publishers);
+      expect(result).toEqual(publishers.data);
+    });
+
+    it('should return empty array if dataFetcherClient.send returns status false', async () => {
+      publishers.success = false;
+      result = await searchDeliveryService.searchPublishers(
+        query,
+        country,
+        language,
+        category,
+      );
+      expect(result).toEqual([]);
     });
 
     it('should throw an error if dataFetcherClient.send throws an error', async () => {

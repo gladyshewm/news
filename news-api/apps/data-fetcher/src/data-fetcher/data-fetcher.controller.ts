@@ -7,10 +7,20 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
-import { SearchPublishersPayload } from '../dto/search-publishers.dto';
-import { SearchArticlesPayload } from '../dto/search-articles.dto';
+import {
+  SearchPublishersDto,
+  SearchPublishersPayload,
+} from '../dto/search-publishers.dto';
+import {
+  SearchArticlesDto,
+  SearchArticlesPayload,
+} from '../dto/search-articles.dto';
 import { SupportedTopicsDto } from '../dto/supported-topics.dto';
-import { TrendingTopicsPayload } from '../dto/trending-topic.dto';
+import {
+  TrendingTopicDto,
+  TrendingTopicsPayload,
+} from '../dto/trending-topic.dto';
+import { DataFetcherResponseDto } from '../dto/data-fetcher-response.dto';
 
 @Controller('data-fetcher')
 export class DataFetcherController {
@@ -34,14 +44,14 @@ export class DataFetcherController {
   async trendingTopics(
     @Payload() payload: TrendingTopicsPayload,
     @Ctx() context: RmqContext,
-  ) {
+  ): Promise<DataFetcherResponseDto<TrendingTopicDto[]>> {
     try {
       const topics = await this.newsApiService.trendingTopics(payload, context);
       await this.dataFetcherService.saveTopics(topics);
 
       return { success: true, data: topics };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, data: null, error: error.message };
     }
   }
 
@@ -49,15 +59,33 @@ export class DataFetcherController {
   async searchArticles(
     @Payload() payload: SearchArticlesPayload,
     @Ctx() context: RmqContext,
-  ) {
-    return this.newsApiService.searchArticles(payload, context);
+  ): Promise<DataFetcherResponseDto<SearchArticlesDto[]>> {
+    try {
+      const articles = await this.newsApiService.searchArticles(
+        payload,
+        context,
+      );
+
+      return { success: true, data: articles };
+    } catch (error) {
+      return { success: false, data: null, error: error.message };
+    }
   }
 
   @MessagePattern('search_publishers')
   async searchPublishers(
     @Payload() payload: SearchPublishersPayload,
     @Ctx() context: RmqContext,
-  ) {
-    return this.newsApiService.searchPublishers(payload, context);
+  ): Promise<DataFetcherResponseDto<SearchPublishersDto[]>> {
+    try {
+      const publishers = await this.newsApiService.searchPublishers(
+        payload,
+        context,
+      );
+
+      return { success: true, data: publishers };
+    } catch (error) {
+      return { success: false, data: null, error: error.message };
+    }
   }
 }

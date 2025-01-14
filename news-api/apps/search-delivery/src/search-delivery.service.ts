@@ -11,6 +11,7 @@ import { SearchPublishersDto } from './dto/search-publishers.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { SupportedTopicsDto } from './dto/supported-topics.dto';
+import { DataFetcherResponseDto } from './dto/data-fetcher-response.dto';
 
 @Injectable()
 export class SearchDeliveryService {
@@ -126,13 +127,20 @@ export class SearchDeliveryService {
   ): Promise<SearchArticlesDto[]> {
     try {
       const articles = await lastValueFrom(
-        this.dataFetcherClient.send<SearchArticlesDto[]>('search_articles', {
+        this.dataFetcherClient.send<
+          DataFetcherResponseDto<SearchArticlesDto[]>
+        >('search_articles', {
           query,
           language,
         }),
       );
 
-      return articles;
+      if (articles.success === false) {
+        this.logger.error(`Failed to fetch search articles: ${articles.error}`);
+        return [];
+      }
+
+      return articles.data;
     } catch (error) {
       this.logger.error(`Failed to fetch search articles: ${error.message}`);
       throw new Error(`Failed to fetch search articles: ${error.message}`);
@@ -147,18 +155,24 @@ export class SearchDeliveryService {
   ): Promise<SearchPublishersDto[]> {
     try {
       const publishers = await lastValueFrom(
-        this.dataFetcherClient.send<SearchPublishersDto[]>(
-          'search_publishers',
-          {
-            query,
-            country,
-            language,
-            category,
-          },
-        ),
+        this.dataFetcherClient.send<
+          DataFetcherResponseDto<SearchPublishersDto[]>
+        >('search_publishers', {
+          query,
+          country,
+          language,
+          category,
+        }),
       );
 
-      return publishers;
+      if (publishers.success === false) {
+        this.logger.error(
+          `Failed to fetch search publishers: ${publishers.error}`,
+        );
+        return [];
+      }
+
+      return publishers.data;
     } catch (error) {
       this.logger.error(`Failed to fetch search publishers: ${error.message}`);
       throw new Error(`Failed to fetch search publishers: ${error.message}`);
