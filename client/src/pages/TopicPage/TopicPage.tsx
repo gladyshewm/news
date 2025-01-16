@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { SupportedTopics, Topic } from '../../types';
 import { searchService } from '../../services/searchService';
 import Loader from '../../components/Loader/Loader';
-import TrendingTopics from '../../features/TrendingTopics/TrendingTopics';
+import TrendingTopics from '../../widgets/TrendingTopics/TrendingTopics';
 import { formatTopic } from '../../utils/formatTopic';
 
 const TopicPage = () => {

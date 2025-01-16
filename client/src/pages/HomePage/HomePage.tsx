@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import './HomePage.css';
-import TrendingTopics from '../../features/TrendingTopics/TrendingTopics';
+import TrendingTopics from '../../widgets/TrendingTopics/TrendingTopics';
 import { Topic } from '../../types';
 import { searchService } from '../../services/searchService';
 import Loader from '../../components/Loader/Loader';
+import LatestNews from '../../widgets/LatestNews/LatestNews';
 
 const HomePage = () => {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -18,7 +19,10 @@ const HomePage = () => {
 
   return (
     <main className="home-page">
-      {isLoading ? <Loader /> : <TrendingTopics topics={topics} />}
+      <div className="digest">
+        {isLoading ? <Loader /> : <TrendingTopics topics={topics} />}
+      </div>
+      {/* <LatestNews /> */}
     </main>
   );
 };

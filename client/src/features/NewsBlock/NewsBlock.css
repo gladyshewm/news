@@ -1,0 +1,29 @@
+.news-block {
+  display: flex;
+  flex-direction: column;
+
+  & .thumbnail,
+  .news-block__content {
+    flex: 1;
+  }
+
+  & .thumbnail {
+    & img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      border-radius: 1.2rem;
+    }
+  }
+
+  & .news-block__content {
+    border: 1px solid green;
+    display: flex;
+    flex-direction: column;
+
+    & header {
+      background-color: #fff;
+      width: 100%;
+    }
+  }
+}

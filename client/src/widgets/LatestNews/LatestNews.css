@@ -1,0 +1,43 @@
+.latest-news {
+  height: 40rem;
+  width: 100%;
+  background-color: rgb(217, 0, 255);
+
+  & header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 3rem;
+    padding: 1rem 1.8rem;
+
+    & a {
+      text-decoration: none;
+      color: #dd2936;
+      font-weight: bold;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #000;
+      }
+    }
+  }
+
+  & .content {
+    background-color: #4ee0e0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: calc(100% - 3rem);
+    width: 100%;
+    padding: 1rem 1.8rem;
+
+    & .news-block {
+      border: 1px solid red;
+      height: 100%;
+    }
+  }
+
+  & .content > .news-block {
+    flex: 1;
+  }
+}
