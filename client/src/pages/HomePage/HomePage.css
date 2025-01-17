@@ -1,4 +1,5 @@
 .home-page {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -6,6 +7,12 @@
 
   & .digest {
     height: 28rem;
+  }
+
+  & .loader-container {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   /* & .latest-news {

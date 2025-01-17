@@ -1,5 +1,13 @@
+import './Loader.css';
+
 const Loader = () => {
-  return <div className="loader">Loading...</div>;
+  return (
+    <div className="loader-container">
+      <div className="spinner">
+        <div className="spinner-rotate"></div>
+      </div>
+    </div>
+  );
 };
 
 export default Loader;
