@@ -5,10 +5,10 @@
   width: 100%;
 
   & .digest {
-    height: 40rem;
+    height: 28rem;
   }
 
-  & .latest-news {
-    margin-top: 1.5rem;
-  }
+  /* & .latest-news {
+    margin-top: 2rem;
+  } */
 }

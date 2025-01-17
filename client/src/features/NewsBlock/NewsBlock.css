@@ -1,29 +1,114 @@
 .news-block {
   display: flex;
   flex-direction: column;
-
-  & .thumbnail,
-  .news-block__content {
-    flex: 1;
-  }
+  min-height: 30rem;
 
   & .thumbnail {
+    height: 15rem;
     & img {
       height: 100%;
       width: 100%;
       object-fit: cover;
-      border-radius: 1.2rem;
+    }
+
+    & svg {
+      height: 100%;
+      width: 100%;
+      stroke: #333333;
+      border: #333333 solid 2px;
     }
   }
 
   & .news-block__content {
-    border: 1px solid green;
     display: flex;
     flex-direction: column;
 
     & header {
-      background-color: #fff;
-      width: 100%;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      color: #333333;
+      font-size: 1.3rem;
+      height: 2.5rem;
+
+      & div:first-child {
+        max-width: 7rem;
+        margin-right: 1rem;
+        font-weight: bold;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      & span {
+        font-size: 2rem;
+        color: #333333;
+        font-weight: bold;
+      }
+
+      & div:last-child {
+        margin-left: 1rem;
+        color: #4e4e4e;
+      }
+    }
+
+    & .body {
+      margin-top: 0.5rem;
+
+      & .title {
+        width: 100%;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333333;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      & .brief {
+        font-size: 1.2rem;
+        color: #4e4e4e;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 4;
+        line-clamp: 4;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+
+    & footer {
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1rem;
+
+      & p {
+        font-size: 1.2rem;
+      }
+
+      & a {
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        color: #212121;
+        border: 2px solid #212121;
+        padding: 0.5rem 0.5rem;
+
+        &:hover {
+          background-color: #eeeeee;
+        }
+      }
     }
   }
 }

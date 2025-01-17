@@ -13,10 +13,6 @@
     display: flex;
     margin-bottom: 2rem;
 
-    & .sidebar {
-      height: 100%;
-    }
-
     & .page-content {
       width: calc(100% - 20rem);
     }

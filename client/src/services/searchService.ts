@@ -27,6 +27,19 @@ class SearchService {
       throw new Error('Failed to fetch topics');
     }
   }
+
+  async getLatestNews(language: string, limit: number): Promise<Topic[]> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/search-delivery/latest-news?language=${language}&limit=${limit}`,
+      );
+      const { data: topics }: { data: Topic[] } = await response.json();
+      return topics;
+    } catch (error) {
+      console.error('Error fetching topics:', error);
+      throw new Error('Failed to fetch topics');
+    }
+  }
 }
 
 export const searchService = new SearchService(API_URL);

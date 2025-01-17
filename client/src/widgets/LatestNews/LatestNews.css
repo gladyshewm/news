@@ -1,40 +1,43 @@
 .latest-news {
   height: 40rem;
   width: 100%;
-  background-color: rgb(217, 0, 255);
+  margin-top: 2rem;
 
-  & header {
+  & > header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 3rem;
+    height: 5rem;
     padding: 1rem 1.8rem;
+
+    & h2 {
+      font-size: 2.5rem;
+    }
 
     & a {
       text-decoration: none;
-      color: #dd2936;
-      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
       transition: all 0.3s ease;
+      color: #212121;
+      border: 2px solid #212121;
+      padding: 0.5rem 2rem;
 
       &:hover {
-        color: #000;
+        background-color: #eeeeee;
       }
     }
   }
 
   & .content {
-    background-color: #4ee0e0;
+    /* background-color: #4ee0e0; */
     display: flex;
-    align-items: center;
     gap: 1rem;
-    height: calc(100% - 3rem);
+    height: calc(100% - 5rem);
     width: 100%;
     padding: 1rem 1.8rem;
-
-    & .news-block {
-      border: 1px solid red;
-      height: 100%;
-    }
   }
 
   & .content > .news-block {
