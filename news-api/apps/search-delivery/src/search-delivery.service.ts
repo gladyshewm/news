@@ -68,7 +68,7 @@ export class SearchDeliveryService {
     try {
       const [topics, count] = await this.trendingTopicRepo.findAndCount({
         where: { language, topicId: topic },
-        order: { [sort]: 'DESC' },
+        // order: { [sort]: 'DESC' },
         skip: (page - 1) * limit,
         take: limit,
         relations: ['publisher'],
@@ -117,6 +117,42 @@ export class SearchDeliveryService {
     } catch (error) {
       this.logger.error(`Failed to fetch trending topics: ${error.message}`);
       throw new Error(`Failed to fetch trending topics: ${error.message}`);
+    }
+  }
+
+  private getCacheKeyLatestNews = (language: string, limit: number) =>
+    `latestNews:${language}-${limit}`;
+
+  async latestNews(
+    language: string,
+    limit: number,
+  ): Promise<TrendingTopicsDBResponseDto> {
+    const cacheKey = this.getCacheKeyLatestNews(language, limit);
+    // const cachedResponse = await this.getTrendingTopicsFromCache(cacheKey);
+    // if (cachedResponse) return cachedResponse;
+
+    try {
+      const [latestNews, total] = await this.trendingTopicRepo.findAndCount({
+        where: { language },
+        order: { date: 'DESC' },
+        skip: 0,
+        take: limit,
+        relations: ['publisher'],
+      });
+
+      const result = {
+        data: latestNews,
+        total,
+        page: 1,
+        pages: Math.ceil(total / limit),
+      };
+
+      await this.cacheManager.set(cacheKey, result, 1000 * 60 * 15);
+
+      return result;
+    } catch (error) {
+      this.logger.error(`Failed to fetch latest news: ${error.message}`);
+      throw new Error(`Failed to fetch latest news: ${error.message}`);
     }
   }
 

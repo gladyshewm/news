@@ -25,6 +25,14 @@ export class SearchDeliveryController {
     );
   }
 
+  @Get('latest-news')
+  async latestNews(
+    @Query('language') language: string = 'ru',
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.searchDeliveryService.latestNews(language, limit);
+  }
+
   @Get('search/articles')
   async searchArticles(
     @Query('query') query: string,
