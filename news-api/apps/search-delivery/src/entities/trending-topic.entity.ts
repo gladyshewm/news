@@ -30,6 +30,9 @@ export class TrendingTopic {
   @Column()
   language: string;
 
+  @Column({ nullable: true })
+  country: string;
+
   @Column()
   contentLength: number;
 

@@ -40,6 +40,7 @@ export class NewsApiService {
   async getTrendingTopics(
     topic: SupportedTopicsDto,
     language: string,
+    country?: string,
   ): Promise<TrendingTopicDto[]> {
     try {
       const {
@@ -50,10 +51,14 @@ export class NewsApiService {
           params: {
             topic,
             language,
+            country: country ?? undefined,
           },
         },
       );
-      topics.forEach((t) => (t.topicId = topic));
+      topics.forEach((t) => {
+        t.topicId = topic;
+        t.country = country ?? '';
+      });
 
       return topics;
     } catch (error) {
@@ -69,9 +74,9 @@ export class NewsApiService {
     payload: TrendingTopicsPayload,
     context: RmqContext,
   ): Promise<TrendingTopicDto[]> {
-    const { topic, language } = payload;
+    const { topic, language, country } = payload;
     try {
-      const topics = await this.getTrendingTopics(topic, language);
+      const topics = await this.getTrendingTopics(topic, language, country);
       return topics;
     } catch (error) {
       this.logger.error(`Failed to fetch trending topics: ${error.message}`);

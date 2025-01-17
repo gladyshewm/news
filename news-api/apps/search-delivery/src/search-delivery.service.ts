@@ -31,7 +31,9 @@ export class SearchDeliveryService {
     page: number,
     limit: number,
     sort: string,
-  ) => `trendingTopics:${language}-${topic}-${page}-${limit}-${sort}`;
+    country?: string,
+  ) =>
+    `trendingTopics:${language}-${topic}-${page}-${limit}-${sort}${country ? `-${country}` : ''}`;
 
   private async getTrendingTopicsFromCache(
     cacheKey: string,
@@ -53,6 +55,7 @@ export class SearchDeliveryService {
     page: number,
     limit: number,
     sort: string,
+    country?: string,
   ): Promise<TrendingTopicsDBResponseDto> {
     const cacheKey = this.getCacheKeyTrendingTopics(
       language,
@@ -60,14 +63,17 @@ export class SearchDeliveryService {
       page,
       limit,
       sort,
+      country,
     );
 
     // const cachedResponse = await this.getTrendingTopicsFromCache(cacheKey);
     // if (cachedResponse) return cachedResponse;
 
     try {
+      const whereCondition: any = { language, topicId: topic };
+      if (country) whereCondition.country = country;
       const [topics, count] = await this.trendingTopicRepo.findAndCount({
-        where: { language, topicId: topic },
+        where: whereCondition,
         // order: { [sort]: 'DESC' },
         skip: (page - 1) * limit,
         take: limit,
@@ -79,12 +85,13 @@ export class SearchDeliveryService {
           this.dataFetcherClient.send('trending_topics', {
             language,
             topic,
+            ...(country && { country }),
           }),
         );
 
         const [newTopics, newCount] = await this.trendingTopicRepo.findAndCount(
           {
-            where: { language, topicId: topic },
+            where: whereCondition,
             order: { [sort]: 'DESC' },
             skip: (page - 1) * limit,
             take: limit,

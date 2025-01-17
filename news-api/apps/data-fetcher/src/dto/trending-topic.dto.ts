@@ -3,6 +3,7 @@ import {
   IsBoolean,
   IsDate,
   IsNumber,
+  IsOptional,
   IsString,
   IsUrl,
   ValidateNested,
@@ -38,6 +39,9 @@ export class TrendingTopicDto {
 
   @IsString()
   language: string;
+
+  @IsString()
+  country: string;
 
   @IsNumber()
   contentLength: number;
@@ -87,4 +91,8 @@ export class TrendingTopicsPayload {
 
   @IsString()
   language: string;
+
+  @IsOptional()
+  @IsString()
+  country?: string;
 }

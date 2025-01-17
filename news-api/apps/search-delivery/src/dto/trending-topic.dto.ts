@@ -30,6 +30,9 @@ export class TrendingTopicDto {
   @IsString()
   language: string;
 
+  @IsString()
+  country: string;
+
   @IsNumber()
   contentLength: number;
 
