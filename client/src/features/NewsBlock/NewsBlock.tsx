@@ -31,7 +31,9 @@ const NewsBlock = ({ topic }: NewsBlockProps) => {
       </div>
       <div className="news-block__content">
         <header>
-          <div>{topic.publisher.name}</div>
+          <div>
+            <abbr title={topic.publisher.name}>{topic.publisher.name}</abbr>
+          </div>
           <span>•</span>
           <div>{topic.topicId}</div>
         </header>

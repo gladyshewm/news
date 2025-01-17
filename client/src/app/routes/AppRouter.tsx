@@ -7,6 +7,7 @@ import {
 import HomePage from '../../pages/HomePage/HomePage';
 import TopicPage from '../../pages/TopicPage/TopicPage';
 import AppLayout from '../../layouts/AppLayout/AppLayout';
+import LatestNewsPage from '../../pages/LatestNewsPage/LatestNewsPage';
 
 const AppRouter = () => {
   const routes: RouteObject[] = [
@@ -18,8 +19,12 @@ const AppRouter = () => {
           element: <HomePage />,
         },
         {
-          path: ':topic',
+          path: ':language/:topic',
           element: <TopicPage />,
+        },
+        {
+          path: 'latest-news',
+          element: <LatestNewsPage />,
         },
       ],
     },

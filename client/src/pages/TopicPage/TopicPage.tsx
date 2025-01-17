@@ -10,17 +10,28 @@ import { formatTopic } from '../../utils/formatTopic';
 const TopicPage = () => {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { topic } = useParams<{ topic: SupportedTopics }>();
+  const { topic, language, country } = useParams<{
+    topic: SupportedTopics;
+    language: string;
+    country?: string;
+  }>();
 
   useEffect(() => {
-    if (topic) {
-      const formattedTopic = formatTopic(topic);
-      searchService
-        .getTrendingTopics('en', formattedTopic, 1, 5, 'date')
-        .then((data) => setTopics(data))
-        .then(() => setIsLoading(false));
-    }
-  }, [topic]);
+    if (!topic || !language) return;
+
+    const formattedTopic = formatTopic(topic);
+    searchService
+      .getTrendingTopics(
+        language,
+        formattedTopic,
+        1,
+        5,
+        'date',
+        country ?? undefined,
+      )
+      .then((data) => setTopics(data))
+      .finally(() => setIsLoading(false));
+  }, [topic, language, country]);
 
   return (
     <main className="topic-page">

@@ -11,8 +11,8 @@ const LatestNews = ({ latestNews }: LatestNewsProps) => {
   return (
     <div className="latest-news">
       <header>
-        <h2>LATEST NEWS</h2>
-        <Link to="#">See all</Link>
+        <h2>Latest News</h2>
+        <Link to="/latest-news">See all</Link>
       </header>
       <div className="content">
         {latestNews.map((topic) => (

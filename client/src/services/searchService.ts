@@ -15,10 +15,16 @@ class SearchService {
     page: number = 1,
     limit: number = 10,
     sort: string = 'date',
+    country?: string,
   ): Promise<Topic[]> {
     try {
+      console.log(language, topic, page, limit, sort, country);
       const response = await fetch(
-        `${this.baseUrl}/search-delivery/trending-topics?language=${language}&topic=${topic}&page=${page}&limit=${limit}&sort=${sort}`,
+        `${
+          this.baseUrl
+        }/search-delivery/trending-topics?language=${language}&topic=${topic}&page=${page}&limit=${limit}&sort=${sort}${
+          country ? `&country=${country}` : ''
+        }`,
       );
       const { data: topics }: { data: Topic[] } = await response.json();
       return topics;

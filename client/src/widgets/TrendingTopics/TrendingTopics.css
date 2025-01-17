@@ -1,12 +1,12 @@
 .trending-topics {
-  height: 40rem;
+  height: 28rem;
   width: 100%;
   display: flex;
 
   & .main-topic {
     display: flex;
     width: 100%;
-    height: 28rem;
+    height: 100%;
 
     & .main-topic__thumbnail {
       flex: 3;
@@ -133,13 +133,12 @@
       padding: 0 1rem;
 
       & p {
-        margin-top: 1.5rem;
         color: #212121;
-        font-size: 1.7rem;
+        font-size: 1.2rem;
         display: -webkit-box;
         -webkit-box-orient: vertical;
-        -webkit-line-clamp: 10;
-        line-clamp: 10;
+        -webkit-line-clamp: 15;
+        line-clamp: 15;
         text-overflow: ellipsis;
         overflow: hidden;
       }

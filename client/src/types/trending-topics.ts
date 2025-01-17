@@ -14,6 +14,7 @@ export type Topic = {
   excerpt: string;
   thumbnail: string;
   language: string;
+  country: string;
   contentLength: number;
   authors: string[];
   publisher: Publisher;
