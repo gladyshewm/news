@@ -14,10 +14,8 @@ const Header = () => {
           <span>TOP STORIES</span>
         </NavLink>
         <div className="caption__right">
-          <div>
-            <span>NEWS. INSIGHTS. ANALYSIS.</span>
-            <span>exclusive report</span>
-          </div>
+          <span>NEWS. INSIGHTS. ANALYSIS.</span>
+          <span>exclusive report</span>
         </div>
       </div>
     </div>

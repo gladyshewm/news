@@ -31,6 +31,17 @@ const NewsBlock = ({ topic }: NewsBlockProps) => {
       </div>
       <div className="news-block__content">
         <header>
+          {isImageLoaded(loadedThumbnails, topic.publisher.favicon) ? (
+            <PhotoIcon />
+          ) : (
+            <img
+              src={topic.publisher.favicon}
+              alt="favicon"
+              onError={() =>
+                handleImageError(setLoadedThumbnails, topic.publisher.favicon)
+              }
+            />
+          )}
           <div>
             <abbr title={topic.publisher.name}>{topic.publisher.name}</abbr>
           </div>
@@ -38,7 +49,9 @@ const NewsBlock = ({ topic }: NewsBlockProps) => {
           <div>{topic.topicId}</div>
         </header>
         <div className="body">
-          <p className="title">{topic.title}</p>
+          <abbr title={topic.title}>
+            <p className="title">{topic.title}</p>
+          </abbr>
           <p className="brief">{topic.excerpt}</p>
         </div>
         <footer>

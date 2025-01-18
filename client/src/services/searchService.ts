@@ -18,7 +18,6 @@ class SearchService {
     country?: string,
   ): Promise<Topic[]> {
     try {
-      console.log(language, topic, page, limit, sort, country);
       const response = await fetch(
         `${
           this.baseUrl
