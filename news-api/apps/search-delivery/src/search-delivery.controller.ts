@@ -31,8 +31,9 @@ export class SearchDeliveryController {
   async latestNews(
     @Query('language') language: string = 'ru',
     @Query('limit') limit: number = 10,
+    @Query('topic') topic: SupportedTopicsDto | '' = '',
   ) {
-    return this.searchDeliveryService.latestNews(language, limit);
+    return this.searchDeliveryService.latestNews(language, limit, topic);
   }
 
   @Get('search/articles')

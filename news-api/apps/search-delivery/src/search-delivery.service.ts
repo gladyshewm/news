@@ -72,6 +72,7 @@ export class SearchDeliveryService {
     try {
       const whereCondition: any = { language, topicId: topic };
       if (country) whereCondition.country = country;
+
       const [topics, count] = await this.trendingTopicRepo.findAndCount({
         where: whereCondition,
         // order: { [sort]: 'DESC' },
@@ -92,7 +93,7 @@ export class SearchDeliveryService {
         const [newTopics, newCount] = await this.trendingTopicRepo.findAndCount(
           {
             where: whereCondition,
-            order: { [sort]: 'DESC' },
+            // order: { [sort]: 'DESC' },
             skip: (page - 1) * limit,
             take: limit,
             relations: ['publisher'],
@@ -127,20 +128,27 @@ export class SearchDeliveryService {
     }
   }
 
-  private getCacheKeyLatestNews = (language: string, limit: number) =>
-    `latestNews:${language}-${limit}`;
+  private getCacheKeyLatestNews = (
+    language: string,
+    limit: number,
+    topic: string,
+  ) => `latestNews:${language}-${limit}-${topic || 'all'}`;
 
   async latestNews(
     language: string,
     limit: number,
+    topic: SupportedTopicsDto | '' = '',
   ): Promise<TrendingTopicsDBResponseDto> {
-    const cacheKey = this.getCacheKeyLatestNews(language, limit);
+    const cacheKey = this.getCacheKeyLatestNews(language, limit, topic);
     // const cachedResponse = await this.getTrendingTopicsFromCache(cacheKey);
     // if (cachedResponse) return cachedResponse;
 
     try {
+      const whereCondition: any = { language };
+      if (topic) whereCondition.topicId = topic;
+
       const [latestNews, total] = await this.trendingTopicRepo.findAndCount({
-        where: { language },
+        where: whereCondition,
         order: { date: 'DESC' },
         skip: 0,
         take: limit,
