@@ -5,6 +5,8 @@ import { Topic } from '../../types';
 import { searchService } from '../../services/searchService';
 import Loader from '../../components/Loader/Loader';
 import LatestNews from '../../widgets/LatestNews/LatestNews';
+import FrequentlyReadNews from '../../widgets/FrequentlyReadNews/FrequentlyReadNews';
+import TopAuthors from '../../widgets/TopAuthors/TopAuthors';
 
 const HomePage = () => {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -19,7 +21,7 @@ const HomePage = () => {
     searchService
       .getLatestNews('en', 3)
       .then((data) => setLatestNews(data))
-      .then(() => setIsLoading(false));
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (
@@ -28,10 +30,10 @@ const HomePage = () => {
         <Loader />
       ) : (
         <>
-          <div className="digest">
-            <TrendingTopics topics={topics} />
-          </div>
+          <TrendingTopics topics={topics} />
           <LatestNews latestNews={latestNews} />
+          <FrequentlyReadNews />
+          <TopAuthors />
         </>
       )}
     </main>

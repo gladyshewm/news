@@ -33,10 +33,14 @@ class SearchService {
     }
   }
 
-  async getLatestNews(language: string, limit: number): Promise<Topic[]> {
+  async getLatestNews(
+    language: string,
+    limit: number,
+    topic: string = '',
+  ): Promise<Topic[]> {
     try {
       const response = await fetch(
-        `${this.baseUrl}/search-delivery/latest-news?language=${language}&limit=${limit}`,
+        `${this.baseUrl}/search-delivery/latest-news?language=${language}&limit=${limit}&topic=${topic}`,
       );
       const { data: topics }: { data: Topic[] } = await response.json();
       return topics;

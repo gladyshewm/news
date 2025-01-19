@@ -6,7 +6,7 @@ const Header = () => {
     <div className="header">
       <h1>GLOBAL TIMES</h1>
       <div className="caption">
-        <NavLink to="/" className="caption__left">
+        <NavLink to="/en/general" className="caption__left">
           <span>BREAKING NEWS</span>
           <div>
             <span>Live Updates</span>

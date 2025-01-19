@@ -15,7 +15,7 @@ const AppRouter = () => {
       element: <AppLayout />,
       children: [
         {
-          index: true,
+          path: ':language/general',
           element: <HomePage />,
         },
         {
@@ -23,14 +23,14 @@ const AppRouter = () => {
           element: <TopicPage />,
         },
         {
-          path: 'latest-news',
+          path: ':language/:topic/latest-news',
           element: <LatestNewsPage />,
         },
       ],
     },
     {
       path: '*',
-      element: <Navigate to="/" />,
+      element: <Navigate to="/en/general" />,
     },
   ];
   const router = createBrowserRouter(routes);
