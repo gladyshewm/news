@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Publisher } from './publisher.entity';
 
 @Entity()
@@ -18,6 +24,6 @@ export class AuthorStat {
   @Column()
   totalClicks: number;
 
-  @Column()
+  @UpdateDateColumn()
   lastUpdated: Date;
 }

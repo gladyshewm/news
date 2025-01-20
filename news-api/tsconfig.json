@@ -35,6 +35,12 @@
       ],
       "@app/redis/*": [
         "libs/redis/src/*"
+      ],
+      "@app/shared": [
+        "libs/shared/src"
+      ],
+      "@app/shared/*": [
+        "libs/shared/src/*"
       ]
     }
   }

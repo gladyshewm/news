@@ -66,6 +66,30 @@ services:
           target: /usr/src/app/apps/search-delivery
           action: sync
 
+  analytics:
+    build:
+      context: ./news-api
+      dockerfile: apps/analytics/Dockerfile
+      target: development
+    container_name: analytics
+    depends_on:
+      - db
+      - redis
+    command: npm run start:dev analytics
+    env_file:
+      - ./news-api/apps/analytics/.env
+    volumes:
+      - /usr/src/app/node_modules
+    networks:
+      - app-network
+    ports:
+      - '3002:3002'
+    develop:
+      watch:
+        - path: ./news-api/apps/analytics
+          target: /usr/src/app/apps/analytics
+          action: sync
+
   db:
     image: postgres:alpine
     restart: always

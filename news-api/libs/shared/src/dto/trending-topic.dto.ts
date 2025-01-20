@@ -1,15 +1,6 @@
 import { IsDate, IsNumber, IsString, IsUrl } from 'class-validator';
-
-export class PublisherDto {
-  @IsString()
-  name: string;
-
-  @IsUrl()
-  url: string;
-
-  @IsString()
-  favicon: string;
-}
+import { PublisherDto } from './publisher.dto';
+import { NewsClickDto } from './news-clicks.dto';
 
 export class TrendingTopicDto {
   @IsString()
@@ -46,4 +37,6 @@ export class TrendingTopicDto {
 
   @IsDate()
   date: Date;
+
+  newsClicks: NewsClickDto[];
 }

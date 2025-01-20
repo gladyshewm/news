@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { TrendingTopic } from './trending-topic.entity';
 
 @Entity()
@@ -18,6 +24,6 @@ export class NewsClick {
   @Column()
   userAgent: string;
 
-  @Column()
+  @CreateDateColumn()
   clickedAt: Date;
 }
