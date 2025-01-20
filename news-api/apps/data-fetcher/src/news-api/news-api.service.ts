@@ -6,26 +6,23 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import {
-  TrendingTopicDto,
-  TrendingTopicsPayload,
-  TrendingTopicsResponseDto,
-} from '../dto/trending-topic.dto';
-import {
-  SearchPublishersDto,
-  SearchPublishersPayload,
-  SearchPublishersResponseDto,
-} from '../dto/search-publishers.dto';
-import {
-  SearchArticlesDto,
-  SearchArticlesPayload,
-  SearchArticlesResponseDto,
-} from '../dto/search-articles.dto';
+
+import { SearchArticlesPayload } from '../dto/search-articles-payload.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { RmqContext } from '@nestjs/microservices';
 import { RmqService } from '@app/rmq';
-import { SupportedTopicsDto } from '../dto/supported-topics.dto';
+import {
+  SearchArticlesDto,
+  SearchArticlesResponseDto,
+  SearchPublishersDto,
+  SupportedTopicsDto,
+  TrendingTopicDto,
+} from '@app/shared';
+import { TrendingTopicsResponseDto } from '../dto/trending-topics-res.dto';
+import { TrendingTopicsPayload } from '../dto/trending-topics-payload.dto';
+import { SearchPublishersPayload } from '../dto/search-publishers-payload.dto';
+import { SearchPublishersResponseDto } from '../dto/search-publishers-res.dto';
 
 @Injectable()
 export class NewsApiService {

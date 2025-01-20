@@ -1,5 +1,5 @@
 import { IsNumber } from 'class-validator';
-import { TrendingTopicDto } from './trending-topic.dto';
+import { TrendingTopicDto } from '@app/shared';
 
 export class TrendingTopicsDBResponseDto {
   data: TrendingTopicDto[];

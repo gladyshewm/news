@@ -4,13 +4,11 @@ import { DataFetcherService } from './data-fetcher.service';
 import { DbModule } from '@app/db';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { TrendingTopic } from './entities/trending-topic.entity';
 import { NewsApiModule } from '../news-api/news-api.module';
-import { Publisher } from './entities/publisher.entity';
 import { TrendingTopicRepository } from './trending-topic.repository';
 import { RmqModule } from '@app/rmq';
 import { DATA_FETCHER_SERVICE } from '../constants/services';
+import { SharedModule } from '@app/shared';
 
 @Module({
   imports: [
@@ -32,7 +30,7 @@ import { DATA_FETCHER_SERVICE } from '../constants/services';
       envFilePath: './apps/data-fetcher/.env',
     }),
     DbModule,
-    TypeOrmModule.forFeature([TrendingTopic, Publisher]),
+    SharedModule,
     RmqModule.register({ name: DATA_FETCHER_SERVICE }),
     NewsApiModule,
   ],

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TrendingTopicDto } from '../dto/trending-topic.dto';
 import { TrendingTopicRepository } from './trending-topic.repository';
+import { TrendingTopicDto } from '@app/shared';
 
 @Injectable()
 export class DataFetcherService {

@@ -11,11 +11,11 @@ import { DataFetcherResponseDto } from '../dto/data-fetcher-response.dto';
 import {
   SearchArticlesDto,
   SearchArticlesPayload,
-} from '../dto/search-articles.dto';
+} from '../dto/search-articles-payload.dto';
 import {
   SearchPublishersDto,
   SearchPublishersPayload,
-} from '../dto/search-publishers.dto';
+} from '../dto/search-publishers-payload.dto';
 
 jest.mock('./data-fetcher.service');
 jest.mock('../news-api/news-api.service');

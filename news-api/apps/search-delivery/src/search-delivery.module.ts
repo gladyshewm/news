@@ -9,10 +9,8 @@ import {
   SEARCH_DELIVERY_SERVICE,
 } from './constants/services';
 import { DbModule } from '@app/db';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { TrendingTopic } from './entities/trending-topic.entity';
-import { Publisher } from './entities/publisher.entity';
 import { RedisModule } from '@app/redis';
+import { SharedModule } from '@app/shared';
 
 @Module({
   imports: [
@@ -36,7 +34,7 @@ import { RedisModule } from '@app/redis';
     RmqModule.register({ name: SEARCH_DELIVERY_SERVICE }),
     RmqModule.register({ name: DATA_FETCHER_SERVICE }),
     DbModule,
-    TypeOrmModule.forFeature([TrendingTopic, Publisher]),
+    SharedModule,
     RedisModule,
   ],
   controllers: [SearchDeliveryController],

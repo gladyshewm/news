@@ -12,11 +12,11 @@ import { RmqContext } from '@nestjs/microservices';
 import {
   SearchArticlesDto,
   SearchArticlesPayload,
-} from '../dto/search-articles.dto';
+} from '../dto/search-articles-payload.dto';
 import {
   SearchPublishersDto,
   SearchPublishersPayload,
-} from '../dto/search-publishers.dto';
+} from '../dto/search-publishers-payload.dto';
 
 describe('NewsApiService', () => {
   let newsApiService: NewsApiService;

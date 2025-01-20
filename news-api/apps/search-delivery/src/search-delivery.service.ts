@@ -1,17 +1,19 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TrendingTopic } from './entities/trending-topic.entity';
 import { Repository } from 'typeorm';
 import { TrendingTopicsDBResponseDto } from './dto/trending-topics-db-res.dto';
 import { DATA_FETCHER_SERVICE } from './constants/services';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { SearchArticlesDto } from './dto/search-articles.dto';
-import { SearchPublishersDto } from './dto/search-publishers.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { SupportedTopicsDto } from './dto/supported-topics.dto';
-import { DataFetcherResponseDto } from './dto/data-fetcher-response.dto';
+import {
+  DataFetcherResponseDto,
+  SearchArticlesDto,
+  SearchPublishersDto,
+  SupportedTopicsDto,
+  TrendingTopic,
+} from '@app/shared';
 
 @Injectable()
 export class SearchDeliveryService {

@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { SearchDeliveryService } from './search-delivery.service';
-import { SupportedTopicsDto } from './dto/supported-topics.dto';
+import { SupportedTopicsDto } from '@app/shared';
 
 // TODO: добавить CRON-задачи
 

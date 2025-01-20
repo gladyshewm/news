@@ -7,20 +7,16 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
+import { SearchPublishersPayload } from '../dto/search-publishers-payload.dto';
+import { SearchArticlesPayload } from '../dto/search-articles-payload.dto';
 import {
-  SearchPublishersDto,
-  SearchPublishersPayload,
-} from '../dto/search-publishers.dto';
-import {
+  DataFetcherResponseDto,
   SearchArticlesDto,
-  SearchArticlesPayload,
-} from '../dto/search-articles.dto';
-import { SupportedTopicsDto } from '../dto/supported-topics.dto';
-import {
+  SearchPublishersDto,
+  SupportedTopicsDto,
   TrendingTopicDto,
-  TrendingTopicsPayload,
-} from '../dto/trending-topic.dto';
-import { DataFetcherResponseDto } from '../dto/data-fetcher-response.dto';
+} from '@app/shared';
+import { TrendingTopicsPayload } from '../dto/trending-topics-payload.dto';
 
 @Controller('data-fetcher')
 export class DataFetcherController {

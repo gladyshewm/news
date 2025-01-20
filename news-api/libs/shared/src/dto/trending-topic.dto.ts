@@ -1,6 +1,6 @@
 import { IsDate, IsNumber, IsString, IsUrl } from 'class-validator';
 
-export class Publisher {
+export class PublisherDto {
   @IsString()
   name: string;
 
@@ -42,7 +42,7 @@ export class TrendingTopicDto {
   @IsString({ each: true })
   keywords: string[];
 
-  publisher: Publisher;
+  publisher: PublisherDto;
 
   @IsDate()
   date: Date;

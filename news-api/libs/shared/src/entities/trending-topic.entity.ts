@@ -2,10 +2,12 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Publisher } from './publisher.entity';
+import { NewsClick } from './news-clicks.entity';
 
 @Entity()
 export class TrendingTopic {
@@ -48,4 +50,9 @@ export class TrendingTopic {
 
   @Column()
   date: Date;
+
+  @OneToMany(() => NewsClick, (newsClick) => newsClick.trendingTopic, {
+    cascade: true,
+  })
+  newsClicks: NewsClick[];
 }
