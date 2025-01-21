@@ -6,6 +6,11 @@ import * as Joi from 'joi';
 import { DbModule } from '@app/db';
 import { SharedModule } from '@app/shared';
 import { RedisModule } from '@app/redis';
+import { RmqModule } from '@app/rmq';
+import {
+  ANALYTICS_SERVICE,
+  SEARCH_DELIVERY_SERVICE,
+} from './constants/services';
 
 @Module({
   imports: [
@@ -20,11 +25,16 @@ import { RedisModule } from '@app/redis';
         POSTGRES_DB: Joi.string().required(),
         REDIS_HOST: Joi.string().required(),
         REDIS_PORT: Joi.number().required(),
+        RMQ_URI: Joi.string().required(),
+        RMQ_SEARCH_DELIVERY_QUEUE: Joi.string().required(),
+        RMQ_ANALYTICS_QUEUE: Joi.string().required(),
       }),
     }),
     DbModule,
     SharedModule,
     RedisModule,
+    RmqModule.register({ name: ANALYTICS_SERVICE }),
+    RmqModule.register({ name: SEARCH_DELIVERY_SERVICE }),
   ],
   controllers: [AnalyticsController],
   providers: [AnalyticsService],

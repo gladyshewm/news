@@ -2,15 +2,18 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TrendingTopicsDBResponseDto } from './dto/trending-topics-db-res.dto';
-import { DATA_FETCHER_SERVICE } from './constants/services';
+import { ANALYTICS_SERVICE, DATA_FETCHER_SERVICE } from './constants/services';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import {
-  DataFetcherResponseDto,
+  AuthorStatsDto,
+  CreateNewsClickDto,
+  FrequentlyReadNewsDto,
   SearchArticlesDto,
   SearchPublishersDto,
+  ServiceResponseDto,
   SupportedTopicsDto,
   TrendingTopic,
 } from '@app/shared';
@@ -24,6 +27,8 @@ export class SearchDeliveryService {
     private readonly trendingTopicRepo: Repository<TrendingTopic>,
     @Inject(DATA_FETCHER_SERVICE)
     private readonly dataFetcherClient: ClientProxy,
+    @Inject(ANALYTICS_SERVICE)
+    private readonly analyticsClient: ClientProxy,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
@@ -180,12 +185,13 @@ export class SearchDeliveryService {
   ): Promise<SearchArticlesDto[]> {
     try {
       const articles = await lastValueFrom(
-        this.dataFetcherClient.send<
-          DataFetcherResponseDto<SearchArticlesDto[]>
-        >('search_articles', {
-          query,
-          language,
-        }),
+        this.dataFetcherClient.send<ServiceResponseDto<SearchArticlesDto[]>>(
+          'search_articles',
+          {
+            query,
+            language,
+          },
+        ),
       );
 
       if (articles.success === false) {
@@ -208,14 +214,15 @@ export class SearchDeliveryService {
   ): Promise<SearchPublishersDto[]> {
     try {
       const publishers = await lastValueFrom(
-        this.dataFetcherClient.send<
-          DataFetcherResponseDto<SearchPublishersDto[]>
-        >('search_publishers', {
-          query,
-          country,
-          language,
-          category,
-        }),
+        this.dataFetcherClient.send<ServiceResponseDto<SearchPublishersDto[]>>(
+          'search_publishers',
+          {
+            query,
+            country,
+            language,
+            category,
+          },
+        ),
       );
 
       if (publishers.success === false) {
@@ -229,6 +236,65 @@ export class SearchDeliveryService {
     } catch (error) {
       this.logger.error(`Failed to fetch search publishers: ${error.message}`);
       throw new Error(`Failed to fetch search publishers: ${error.message}`);
+    }
+  }
+
+  async registerClick(createNewsClickDto: CreateNewsClickDto) {
+    try {
+      await lastValueFrom(
+        this.analyticsClient.emit('news_click', createNewsClickDto),
+      );
+    } catch (error) {
+      this.logger.error(`Failed to register click: ${error.message}`);
+      throw new Error(`Failed to register click: ${error.message}`);
+    }
+  }
+
+  // TODO: cache
+
+  async frequentlyReadNews(limit: number): Promise<FrequentlyReadNewsDto[]> {
+    try {
+      const frequentlyReadNews = await lastValueFrom(
+        this.analyticsClient.send<ServiceResponseDto<FrequentlyReadNewsDto[]>>(
+          'frequently_read_news',
+          { limit },
+        ),
+      );
+
+      if (frequentlyReadNews.success === false) {
+        this.logger.error(
+          `Failed to fetch frequently read news: ${frequentlyReadNews.error}`,
+        );
+        return [];
+      }
+
+      return frequentlyReadNews.data;
+    } catch (error) {
+      this.logger.error(
+        `Failed to fetch frequently read news: ${error.message}`,
+      );
+      throw new Error(`Failed to fetch frequently read news: ${error.message}`);
+    }
+  }
+
+  async topAuthors(limit: number): Promise<AuthorStatsDto[]> {
+    try {
+      const authors = await lastValueFrom(
+        this.analyticsClient.send<ServiceResponseDto<AuthorStatsDto[]>>(
+          'top_authors',
+          { limit },
+        ),
+      );
+
+      if (authors.success === false) {
+        this.logger.error(`Failed to fetch top authors: ${authors.error}`);
+        return [];
+      }
+
+      return authors.data;
+    } catch (error) {
+      this.logger.error(`Failed to fetch top authors: ${error.message}`);
+      throw new Error(`Failed to fetch top authors: ${error.message}`);
     }
   }
 }

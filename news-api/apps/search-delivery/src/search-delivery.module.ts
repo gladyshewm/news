@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { RmqModule } from '@app/rmq';
 import {
+  ANALYTICS_SERVICE,
   DATA_FETCHER_SERVICE,
   SEARCH_DELIVERY_SERVICE,
 } from './constants/services';
@@ -26,6 +27,7 @@ import { SharedModule } from '@app/shared';
         RMQ_URI: Joi.string().required(),
         RMQ_SEARCH_DELIVERY_QUEUE: Joi.string().required(),
         RMQ_DATA_FETCHER_QUEUE: Joi.string().required(),
+        RMQ_ANALYTICS_QUEUE: Joi.string().required(),
         REDIS_HOST: Joi.string().required(),
         REDIS_PORT: Joi.number().required(),
       }),
@@ -33,6 +35,7 @@ import { SharedModule } from '@app/shared';
     }),
     RmqModule.register({ name: SEARCH_DELIVERY_SERVICE }),
     RmqModule.register({ name: DATA_FETCHER_SERVICE }),
+    RmqModule.register({ name: ANALYTICS_SERVICE }),
     DbModule,
     SharedModule,
     RedisModule,

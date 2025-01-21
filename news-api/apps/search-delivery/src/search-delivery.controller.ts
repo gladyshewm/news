@@ -1,6 +1,11 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { SearchDeliveryService } from './search-delivery.service';
-import { SupportedTopicsDto } from '@app/shared';
+import {
+  AuthorStatsDto,
+  CreateNewsClickDto,
+  FrequentlyReadNewsDto,
+  SupportedTopicsDto,
+} from '@app/shared';
 
 // TODO: добавить CRON-задачи
 
@@ -57,5 +62,26 @@ export class SearchDeliveryController {
       language,
       category,
     );
+  }
+
+  @Post('analytics/news-click')
+  async registerClick(
+    @Body() createNewsClickDto: CreateNewsClickDto,
+  ): Promise<void> {
+    return this.searchDeliveryService.registerClick(createNewsClickDto);
+  }
+
+  @Get('analytics/frequently-read-news')
+  async frequentlyReadNews(
+    @Query('limit') limit: number = 10,
+  ): Promise<FrequentlyReadNewsDto[]> {
+    return this.searchDeliveryService.frequentlyReadNews(limit);
+  }
+
+  @Get('analytics/top-authors')
+  async topAuthors(
+    @Query('limit') limit: number = 10,
+  ): Promise<AuthorStatsDto[]> {
+    return this.searchDeliveryService.topAuthors(limit);
   }
 }

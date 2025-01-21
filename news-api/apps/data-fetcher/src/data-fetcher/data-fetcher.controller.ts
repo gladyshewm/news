@@ -10,9 +10,9 @@ import {
 import { SearchPublishersPayload } from '../dto/search-publishers-payload.dto';
 import { SearchArticlesPayload } from '../dto/search-articles-payload.dto';
 import {
-  DataFetcherResponseDto,
   SearchArticlesDto,
   SearchPublishersDto,
+  ServiceResponseDto,
   SupportedTopicsDto,
   TrendingTopicDto,
 } from '@app/shared';
@@ -40,7 +40,7 @@ export class DataFetcherController {
   async trendingTopics(
     @Payload() payload: TrendingTopicsPayload,
     @Ctx() context: RmqContext,
-  ): Promise<DataFetcherResponseDto<TrendingTopicDto[]>> {
+  ): Promise<ServiceResponseDto<TrendingTopicDto[]>> {
     try {
       const topics = await this.newsApiService.trendingTopics(payload, context);
       await this.dataFetcherService.saveTopics(topics);
@@ -55,7 +55,7 @@ export class DataFetcherController {
   async searchArticles(
     @Payload() payload: SearchArticlesPayload,
     @Ctx() context: RmqContext,
-  ): Promise<DataFetcherResponseDto<SearchArticlesDto[]>> {
+  ): Promise<ServiceResponseDto<SearchArticlesDto[]>> {
     try {
       const articles = await this.newsApiService.searchArticles(
         payload,
@@ -72,7 +72,7 @@ export class DataFetcherController {
   async searchPublishers(
     @Payload() payload: SearchPublishersPayload,
     @Ctx() context: RmqContext,
-  ): Promise<DataFetcherResponseDto<SearchPublishersDto[]>> {
+  ): Promise<ServiceResponseDto<SearchPublishersDto[]>> {
     try {
       const publishers = await this.newsApiService.searchPublishers(
         payload,

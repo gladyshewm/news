@@ -4,19 +4,22 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { CreateNewsClickDto } from './dto/create-news-click.dto';
 import {
   AuthorStat,
   AuthorStatsDto,
+  CreateNewsClickDto,
+  FrequentlyReadNewsDto,
   NewsClick,
-  NewsClickDto,
   TrendingTopic,
 } from '@app/shared';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { FrequentlyReadNewsDto } from './dto/frequently-read-news.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { RmqContext } from '@nestjs/microservices';
+import { RmqService } from '@app/rmq';
+import { FrequentlyReadNewsPayload } from './dto/frequently-read-news-payload.dto';
+import { TopAuthorsPayload } from './dto/top-authors-payload.dto';
 
 @Injectable()
 export class AnalyticsService {
@@ -30,11 +33,13 @@ export class AnalyticsService {
     @InjectRepository(AuthorStat)
     private authorStatRepository: Repository<AuthorStat>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly rmqService: RmqService,
   ) {}
 
   async registerClick(
     createNewsClickDto: CreateNewsClickDto,
-  ): Promise<NewsClickDto> {
+    context: RmqContext,
+  ): Promise<void> {
     try {
       const newsClick = this.newsClickRepository.create(createNewsClickDto);
       await this.newsClickRepository.save(newsClick);
@@ -69,20 +74,21 @@ export class AnalyticsService {
         await this.authorStatRepository.save(newStat);
       }
 
-      return newsClick;
+      // return newsClick;
     } catch (error) {
       this.logger.error(`Failed to register click: ${error.message}`);
       throw new Error(`Failed to register click: ${error.message}`);
+    } finally {
+      this.rmqService.ack(context);
     }
   }
 
-  // TODO: cache
-  async frequentlyReadNews(limit: number): Promise<FrequentlyReadNewsDto[]> {
-    const cacheKey = `frequently_read_news_${limit}`;
-    const cached =
-      await this.cacheManager.get<FrequentlyReadNewsDto[]>(cacheKey);
+  async getFrequentlyReadNews(limit: number): Promise<FrequentlyReadNewsDto[]> {
+    // const cacheKey = `frequently_read_news_${limit}`;
+    // const cached =
+    //   await this.cacheManager.get<FrequentlyReadNewsDto[]>(cacheKey);
 
-    if (cached) return cached;
+    // if (cached) return cached;
 
     try {
       const { entities: news, raw } = await this.trendingTopicRepository
@@ -117,7 +123,7 @@ export class AnalyticsService {
         clicksCount: parseInt(raw[idx].clicks_count),
       }));
 
-      await this.cacheManager.set(cacheKey, frequentlyReadNews, 1000 * 60 * 15);
+      // await this.cacheManager.set(cacheKey, frequentlyReadNews, 1000 * 60 * 15);
 
       return frequentlyReadNews;
     } catch (error) {
@@ -130,11 +136,29 @@ export class AnalyticsService {
     }
   }
 
-  async getTopAuthors(limit: number): Promise<AuthorStatsDto[]> {
-    const cacheKey = `top_authors_${limit}`;
-    const cached = await this.cacheManager.get<AuthorStatsDto[]>(cacheKey);
+  async frequentlyReadNews(
+    payload: FrequentlyReadNewsPayload,
+    context: RmqContext,
+  ): Promise<FrequentlyReadNewsDto[]> {
+    const { limit } = payload;
+    try {
+      const frequentlyReadNews = await this.getFrequentlyReadNews(limit);
+      return frequentlyReadNews;
+    } catch (error) {
+      this.logger.error(
+        `Failed to fetch frequently read news: ${error.message}`,
+      );
+      throw new Error(`Failed to fetch frequently read news: ${error.message}`);
+    } finally {
+      this.rmqService.ack(context);
+    }
+  }
 
-    if (cached) return cached;
+  async getTopAuthors(limit: number): Promise<AuthorStatsDto[]> {
+    // const cacheKey = `top_authors_${limit}`;
+    // const cached = await this.cacheManager.get<AuthorStatsDto[]>(cacheKey);
+
+    // if (cached) return cached;
 
     try {
       const { entities: authors } = await this.authorStatRepository
@@ -169,7 +193,7 @@ export class AnalyticsService {
       //   publisher: author.publisher,
       // }));
 
-      await this.cacheManager.set(cacheKey, authors, 1000 * 60 * 15);
+      // await this.cacheManager.set(cacheKey, authors, 1000 * 60 * 15);
 
       return authors;
     } catch (error) {
@@ -177,6 +201,19 @@ export class AnalyticsService {
       throw new InternalServerErrorException(
         `Failed to fetch top authors: ${error.message}`,
       );
+    }
+  }
+
+  async topAuthors(payload: TopAuthorsPayload, context: RmqContext) {
+    const { limit } = payload;
+    try {
+      const authors = await this.getTopAuthors(limit);
+      return authors;
+    } catch (error) {
+      this.logger.error(`Failed to fetch top authors: ${error.message}`);
+      throw new Error(`Failed to fetch top authors: ${error.message}`);
+    } finally {
+      this.rmqService.ack(context);
     }
   }
 }

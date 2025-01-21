@@ -1,31 +1,61 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
-import { CreateNewsClickDto } from './dto/create-news-click.dto';
-import { AuthorStatsDto, NewsClickDto } from '@app/shared';
-import { FrequentlyReadNewsDto } from './dto/frequently-read-news.dto';
+import {
+  AuthorStatsDto,
+  CreateNewsClickDto,
+  FrequentlyReadNewsDto,
+  ServiceResponseDto,
+} from '@app/shared';
+import {
+  Ctx,
+  EventPattern,
+  MessagePattern,
+  Payload,
+  RmqContext,
+} from '@nestjs/microservices';
+import { FrequentlyReadNewsPayload } from './dto/frequently-read-news-payload.dto';
+import { TopAuthorsPayload } from './dto/top-authors-payload.dto';
 
 @Controller('analytics')
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
-  @Post('news-click')
-  async registerClick(
-    @Body() createNewsClickDto: CreateNewsClickDto,
-  ): Promise<NewsClickDto> {
-    return this.analyticsService.registerClick(createNewsClickDto);
+  @EventPattern('news_click')
+  async handleNewsClick(
+    @Payload() payload: CreateNewsClickDto,
+    @Ctx() context: RmqContext,
+  ): Promise<void> {
+    await this.analyticsService.registerClick(payload, context);
   }
 
-  @Get('frequently-read')
+  @MessagePattern('frequently_read_news')
   async frequentlyReadNews(
-    @Query('limit') limit: number = 10,
-  ): Promise<FrequentlyReadNewsDto[]> {
-    return this.analyticsService.frequentlyReadNews(limit);
+    @Payload() payload: FrequentlyReadNewsPayload,
+    @Ctx() context: RmqContext,
+  ): Promise<ServiceResponseDto<FrequentlyReadNewsDto[]>> {
+    try {
+      const news = await this.analyticsService.frequentlyReadNews(
+        payload,
+        context,
+      );
+
+      return { success: true, data: news };
+    } catch (error) {
+      return { success: false, data: null, error: error.message };
+    }
   }
 
-  @Get('top-authors')
-  async getTopAuthors(
-    @Query('limit') limit: number = 10,
-  ): Promise<AuthorStatsDto[]> {
-    return this.analyticsService.getTopAuthors(limit);
+  @MessagePattern('top_authors')
+  async topAuthors(
+    @Payload() payload: TopAuthorsPayload,
+    @Ctx() context: RmqContext,
+  ): Promise<ServiceResponseDto<AuthorStatsDto[]>> {
+    try {
+      const authors = await this.analyticsService.topAuthors(payload, context);
+
+      return { success: true, data: authors };
+    } catch (error) {
+      return { success: false, data: null, error: error.message };
+    }
   }
 }
