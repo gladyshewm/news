@@ -2,16 +2,29 @@ import { Link, useParams } from 'react-router-dom';
 import './LatestNews.css';
 import NewsBlock from '../../features/NewsBlock/NewsBlock';
 import { Topic } from '../../types';
+import { useEffect, useState } from 'react';
+import { searchService } from '../../services/searchService';
+import Loader from '../../components/Loader/Loader';
 
 interface LatestNewsProps {
-  latestNews: Topic[];
+  limit: number;
 }
 
-const LatestNews = ({ latestNews }: LatestNewsProps) => {
+const LatestNews = ({ limit }: LatestNewsProps) => {
+  const [latestNews, setLatestNews] = useState<Topic[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const { language = 'en', topic = 'general' } = useParams<{
     language: string;
     topic: string;
   }>();
+
+  useEffect(() => {
+    searchService
+      .getLatestNews(language, limit, topic === 'general' ? '' : topic)
+      .then((data) => setLatestNews(data))
+      .finally(() => setIsLoading(false));
+  }, [language, limit, topic]);
 
   return (
     <div className="latest-news">
@@ -20,9 +33,15 @@ const LatestNews = ({ latestNews }: LatestNewsProps) => {
         <Link to={`/${language}/${topic}/latest-news`}>See all</Link>
       </header>
       <div className="content">
-        {latestNews.map((topic) => (
-          <NewsBlock key={topic.id} topic={topic} />
-        ))}
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <>
+            {latestNews.map((topic) => (
+              <NewsBlock key={topic.id} topic={topic} />
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

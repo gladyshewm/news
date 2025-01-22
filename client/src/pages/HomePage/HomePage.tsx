@@ -5,23 +5,18 @@ import { Topic } from '../../types';
 import { searchService } from '../../services/searchService';
 import Loader from '../../components/Loader/Loader';
 import LatestNews from '../../widgets/LatestNews/LatestNews';
-import FrequentlyReadNews from '../../widgets/FrequentlyReadNews/FrequentlyReadNews';
 import TopAuthors from '../../widgets/TopAuthors/TopAuthors';
+import FrequentlyReadTopics from '../../widgets/FrequentlyReadTopics/FrequentlyReadTopics';
 
 const HomePage = () => {
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [latestNews, setLatestNews] = useState<Topic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     searchService
       .getTrendingTopics('en', 'General', 1, 5, 'date')
+      .finally(() => setIsLoading(false))
       .then((data) => setTopics(data));
-
-    searchService
-      .getLatestNews('en', 3)
-      .then((data) => setLatestNews(data))
-      .finally(() => setIsLoading(false));
   }, []);
 
   return (
@@ -31,9 +26,9 @@ const HomePage = () => {
       ) : (
         <>
           <TrendingTopics topics={topics} />
-          <LatestNews latestNews={latestNews} />
-          <FrequentlyReadNews />
-          <TopAuthors />
+          <LatestNews limit={3} />
+          <FrequentlyReadTopics limit={3} />
+          <TopAuthors limit={4} />
         </>
       )}
     </main>

@@ -1,6 +1,6 @@
 .top-authors {
-  background-color: rgb(108, 246, 143);
-  height: 10rem;
+  /* background-color: rgb(108, 246, 143); */
+  height: 20rem;
 
   & > header {
     display: flex;
@@ -26,6 +26,58 @@
 
       &:hover {
         background-color: #eeeeee;
+      }
+    }
+  }
+
+  & .content {
+    display: flex;
+    gap: 1rem;
+    height: calc(100% - 7rem);
+    width: 100%;
+    padding: 1rem 1.8rem;
+
+    & .author-block {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      height: 7rem;
+      min-width: 7rem;
+
+      & > abbr {
+        height: 5rem;
+        width: 5rem;
+
+        & a {
+          height: 100%;
+          width: 100%;
+
+          & img {
+            height: 100%;
+            width: 100%;
+            border-radius: 50%;
+            cursor: pointer;
+          }
+        }
+      }
+
+      & > abbr + a {
+        margin-left: 1rem;
+        text-decoration: none;
+        color: #212121;
+        font-size: 1.2rem;
+        font-weight: 700;
+        transition: color 0.3s ease;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+        text-overflow: ellipsis;
+        overflow: hidden;
+
+        &:hover {
+          color: #4e4e4e;
+        }
       }
     }
   }

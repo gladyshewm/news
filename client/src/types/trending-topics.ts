@@ -1,10 +1,5 @@
+import { Publisher } from './publisher';
 import { SupportedTopics } from './supported-topics';
-
-export type Publisher = {
-  name: string;
-  url: string;
-  favicon: string;
-};
 
 export type Topic = {
   id: number;
