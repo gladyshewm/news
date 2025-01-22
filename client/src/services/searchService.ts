@@ -82,6 +82,21 @@ class SearchService {
       throw new Error('Failed to fetch top authors');
     }
   }
+
+  async registerClick(trendingTopicId: number): Promise<void> {
+    try {
+      await fetch(`${this.baseUrl}/search-delivery/analytics/news-click`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ trendingTopicId }),
+      });
+    } catch (error) {
+      console.error('Error when processing a click:', error);
+      throw new Error('Error when processing a click');
+    }
+  }
 }
 
 export const searchService = new SearchService(API_URL);

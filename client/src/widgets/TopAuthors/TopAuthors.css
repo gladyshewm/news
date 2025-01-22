@@ -58,6 +58,22 @@
             border-radius: 50%;
             cursor: pointer;
           }
+
+          & > div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            border: 2px solid #212121;
+            border-radius: 50%;
+
+            & svg {
+              stroke: #212121;
+              height: 3rem;
+              width: 3rem;
+            }
+          }
         }
       }
 

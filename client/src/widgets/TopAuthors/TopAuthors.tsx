@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { AuthorStats } from '../../types';
 import { searchService } from '../../services/searchService';
 import Loader from '../../components/Loader/Loader';
+import { handleImageError, isImageLoaded } from '../../utils/isImageLoaded';
+import { PhotoIcon } from '../../icons';
 
 interface TopAuthorsProps {
   limit: number;
@@ -12,6 +14,9 @@ interface TopAuthorsProps {
 const TopAuthors = ({ limit }: TopAuthorsProps) => {
   const [topAuthors, setTopAuthors] = useState<AuthorStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadedThumbnails, setLoadedThumbnails] = useState<Set<string>>(
+    new Set(),
+  );
 
   useEffect(() => {
     searchService
@@ -39,7 +44,25 @@ const TopAuthors = ({ limit }: TopAuthorsProps) => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <img src={author.publisher.favicon} alt="favicon" />
+                    {isImageLoaded(
+                      loadedThumbnails,
+                      author.publisher.favicon,
+                    ) ? (
+                      <div>
+                        <PhotoIcon />
+                      </div>
+                    ) : (
+                      <img
+                        src={author.publisher.favicon}
+                        alt="favicon"
+                        onError={() =>
+                          handleImageError(
+                            setLoadedThumbnails,
+                            author.publisher.favicon,
+                          )
+                        }
+                      />
+                    )}
                   </a>
                 </abbr>
                 <a

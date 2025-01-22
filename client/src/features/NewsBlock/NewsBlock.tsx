@@ -4,6 +4,7 @@ import './NewsBlock.css';
 import { PhotoIcon } from '../../icons';
 import { formatTopicDate } from '../../utils/formatDate';
 import { Topic } from '../../types';
+import { searchService } from '../../services/searchService';
 
 interface NewsBlockProps {
   topic: Topic;
@@ -13,6 +14,10 @@ const NewsBlock = ({ topic }: NewsBlockProps) => {
   const [loadedThumbnails, setLoadedThumbnails] = useState<Set<string>>(
     new Set(),
   );
+
+  const handleClick = async () => {
+    await searchService.registerClick(topic.id);
+  };
 
   return (
     <div className="news-block">
@@ -56,7 +61,14 @@ const NewsBlock = ({ topic }: NewsBlockProps) => {
         </div>
         <footer>
           <p>{formatTopicDate(topic.date)}</p>
-          <a href={topic.url}>Read more</a>
+          <a
+            href={topic.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleClick}
+          >
+            Read more
+          </a>
         </footer>
       </div>
     </div>

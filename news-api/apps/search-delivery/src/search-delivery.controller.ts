@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
 import { SearchDeliveryService } from './search-delivery.service';
 import {
   AuthorStatsDto,
-  CreateNewsClickDto,
   FrequentlyReadNewsDto,
   SupportedTopicsDto,
 } from '@app/shared';
+import { Request } from 'express';
 
 // TODO: добавить CRON-задачи
 
@@ -66,9 +66,14 @@ export class SearchDeliveryController {
 
   @Post('analytics/news-click')
   async registerClick(
-    @Body() createNewsClickDto: CreateNewsClickDto,
+    @Body('trendingTopicId') trendingTopicId: number,
+    @Req() req: Request,
   ): Promise<void> {
-    return this.searchDeliveryService.registerClick(createNewsClickDto);
+    return this.searchDeliveryService.registerClick({
+      trendingTopicId,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
   }
 
   @Get('analytics/frequently-read-news')
