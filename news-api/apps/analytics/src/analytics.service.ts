@@ -94,8 +94,13 @@ export class AnalyticsService {
       const { entities: news, raw } = await this.trendingTopicRepository
         .createQueryBuilder('trending_topic')
         .leftJoinAndSelect('trending_topic.newsClicks', 'news_click')
+        .leftJoinAndSelect('trending_topic.publisher', 'publisher')
         .select([
           'trending_topic',
+          'publisher.id',
+          'publisher.name',
+          'publisher.url',
+          'publisher.favicon',
           'COUNT(DISTINCT news_click.id) as clicks_count',
         ])
         .groupBy('trending_topic.id')
@@ -112,6 +117,10 @@ export class AnalyticsService {
             'trending_topic.authors',
             'trending_topic.keywords',
             'trending_topic.date',
+            'publisher.id',
+            'publisher.name',
+            'publisher.url',
+            'publisher.favicon',
           ].join(', '),
         )
         .orderBy('clicks_count', 'DESC')

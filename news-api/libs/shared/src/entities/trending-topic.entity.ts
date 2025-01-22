@@ -2,8 +2,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Publisher } from './publisher.entity';
@@ -44,7 +44,7 @@ export class TrendingTopic {
   @Column('text', { array: true, default: [] })
   keywords: string[];
 
-  @OneToOne(() => Publisher, (publisher) => publisher.id, { cascade: true })
+  @ManyToOne(() => Publisher, (publisher) => publisher.id, { cascade: true })
   @JoinColumn()
   publisher: Publisher;
 
