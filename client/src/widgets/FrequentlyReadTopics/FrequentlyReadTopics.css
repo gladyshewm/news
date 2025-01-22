@@ -1,6 +1,6 @@
-.frequently-read-news {
-  background-color: rgb(108, 108, 246);
-  height: 10rem;
+.frequently-read-topics {
+  /* background-color: rgb(108, 108, 246); */
+  height: 40rem;
 
   & > header {
     display: flex;
@@ -28,5 +28,17 @@
         background-color: #eeeeee;
       }
     }
+  }
+
+  & .content {
+    display: flex;
+    gap: 1rem;
+    height: calc(100% - 7rem);
+    width: 100%;
+    padding: 1rem 1.8rem;
+  }
+
+  & .content > .news-block {
+    flex: 1;
   }
 }
