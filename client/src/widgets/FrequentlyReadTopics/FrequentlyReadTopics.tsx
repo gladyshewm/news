@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './FrequentlyReadTopics.css';
 import { useEffect, useState } from 'react';
 import { searchService } from '../../services/searchService';
@@ -15,6 +15,10 @@ const FrequentlyReadTopics = ({ limit }: FrequentlyReadTopicsProps) => {
     FrequentlyReadNews[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { language = 'en', topic = 'general' } = useParams<{
+    language: string;
+    topic: string;
+  }>();
 
   useEffect(() => {
     searchService
@@ -27,7 +31,7 @@ const FrequentlyReadTopics = ({ limit }: FrequentlyReadTopicsProps) => {
     <div className="frequently-read-topics">
       <header>
         <h2>Frequently Read</h2>
-        <Link to={`#`}>See all</Link>
+        <Link to={`/${language}/${topic}/frequently-read`}>See all</Link>
       </header>
       <div className="content">
         {isLoading ? (

@@ -45,7 +45,7 @@
         stroke: #333333;
       }
 
-      & div:nth-of-type(1) abbr {
+      & > div:nth-of-type(1) abbr {
         font-size: 1.2rem;
         text-decoration: none;
         max-width: 7rem;
@@ -59,15 +59,19 @@
         overflow: hidden;
       }
 
-      & span {
+      & div:nth-of-type(1) + span {
         font-size: 2rem;
         color: #333333;
         font-weight: bold;
       }
 
-      & div:last-child {
+      & div:nth-of-type(2) {
         margin-left: 0.5rem;
         color: #4e4e4e;
+      }
+
+      & .extra-content {
+        margin-left: auto;
       }
     }
 

@@ -5,6 +5,7 @@ import { Topic } from '../../types';
 import { useEffect, useState } from 'react';
 import { searchService } from '../../services/searchService';
 import Loader from '../../components/Loader/Loader';
+import { formatTopic } from '../../utils/formatTopic';
 
 interface LatestNewsProps {
   limit: number;
@@ -20,8 +21,10 @@ const LatestNews = ({ limit }: LatestNewsProps) => {
   }>();
 
   useEffect(() => {
+    const formattedTopic = formatTopic(topic);
+
     searchService
-      .getLatestNews(language, limit, topic === 'general' ? '' : topic)
+      .getLatestNews(language, limit, formattedTopic)
       .then((data) => setLatestNews(data))
       .finally(() => setIsLoading(false));
   }, [language, limit, topic]);

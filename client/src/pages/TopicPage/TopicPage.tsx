@@ -10,7 +10,6 @@ import LatestNews from '../../widgets/LatestNews/LatestNews';
 
 const TopicPage = () => {
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [latestNews, setLatestNews] = useState<Topic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { topic, language, country } = useParams<{
     topic: string;
@@ -31,11 +30,7 @@ const TopicPage = () => {
         'date',
         country ?? undefined,
       )
-      .then((data) => setTopics(data));
-
-    searchService
-      .getLatestNews(language, 3, formattedTopic)
-      .then((data) => setLatestNews(data))
+      .then((data) => setTopics(data))
       .finally(() => setIsLoading(false));
   }, [topic, language, country]);
 
@@ -46,7 +41,7 @@ const TopicPage = () => {
       ) : (
         <>
           <TrendingTopics topics={topics} />
-          <LatestNews latestNews={latestNews} />
+          <LatestNews limit={3} />
         </>
       )}
     </main>

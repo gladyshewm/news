@@ -8,9 +8,10 @@ import { searchService } from '../../services/searchService';
 
 interface NewsBlockProps {
   topic: Topic;
+  extraHeaderContent?: React.ReactNode;
 }
 
-const NewsBlock = ({ topic }: NewsBlockProps) => {
+const NewsBlock = ({ topic, extraHeaderContent }: NewsBlockProps) => {
   const [loadedThumbnails, setLoadedThumbnails] = useState<Set<string>>(
     new Set(),
   );
@@ -52,6 +53,9 @@ const NewsBlock = ({ topic }: NewsBlockProps) => {
           </div>
           <span>•</span>
           <div>{topic.topicId}</div>
+          {extraHeaderContent && (
+            <div className="extra-content">{extraHeaderContent}</div>
+          )}
         </header>
         <div className="body">
           <abbr title={topic.title}>
