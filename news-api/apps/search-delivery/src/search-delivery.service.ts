@@ -2,7 +2,10 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TrendingTopicsDBResponseDto } from './dto/trending-topics-db-res.dto';
-import { ANALYTICS_SERVICE, DATA_FETCHER_SERVICE } from './constants/services';
+import {
+  ANALYTICS_SERVICE,
+  DATA_FETCHER_SERVICE,
+} from './constants/services.constant';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -17,6 +20,7 @@ import {
   SupportedTopicsDto,
   TrendingTopic,
 } from '@app/shared';
+import { CACHE_KEYS } from './constants/cache-keys.constant';
 
 @Injectable()
 export class SearchDeliveryService {
@@ -32,27 +36,15 @@ export class SearchDeliveryService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  private getCacheKeyTrendingTopics = (
-    language: string,
-    topic: SupportedTopicsDto,
-    page: number,
-    limit: number,
-    sort: string,
-    country?: string,
-  ) =>
-    `trendingTopics:${language}-${topic}-${page}-${limit}-${sort}${country ? `-${country}` : ''}`;
-
-  private async getTrendingTopicsFromCache(
+  private async getCacheData<T>(
     cacheKey: string,
-  ): Promise<TrendingTopicsDBResponseDto | null> {
+    fallBackValue: T = null as T,
+  ): Promise<T> {
     try {
-      return (
-        (await this.cacheManager.get<TrendingTopicsDBResponseDto>(cacheKey)) ||
-        null
-      );
+      return (await this.cacheManager.get(cacheKey)) || fallBackValue;
     } catch (error) {
       this.logger.warn(`Cache error: ${error.message}`);
-      return null;
+      return fallBackValue;
     }
   }
 
@@ -64,7 +56,7 @@ export class SearchDeliveryService {
     sort: string,
     country?: string,
   ): Promise<TrendingTopicsDBResponseDto> {
-    const cacheKey = this.getCacheKeyTrendingTopics(
+    const cacheKey = CACHE_KEYS.TRENDING_TOPICS(
       language,
       topic,
       page,
@@ -73,8 +65,9 @@ export class SearchDeliveryService {
       country,
     );
 
-    // const cachedResponse = await this.getTrendingTopicsFromCache(cacheKey);
-    // if (cachedResponse) return cachedResponse;
+    const cachedResponse =
+      await this.getCacheData<TrendingTopicsDBResponseDto>(cacheKey);
+    if (cachedResponse) return cachedResponse;
 
     try {
       const whereCondition: any = { language, topicId: topic };
@@ -87,37 +80,6 @@ export class SearchDeliveryService {
         take: limit,
         relations: ['publisher'],
       });
-
-      if (count === 0) {
-        await lastValueFrom(
-          this.dataFetcherClient.send('trending_topics', {
-            language,
-            topic,
-            ...(country && { country }),
-          }),
-        );
-
-        const [newTopics, newCount] = await this.trendingTopicRepo.findAndCount(
-          {
-            where: whereCondition,
-            // order: { [sort]: 'DESC' },
-            skip: (page - 1) * limit,
-            take: limit,
-            relations: ['publisher'],
-          },
-        );
-
-        const result = {
-          data: newTopics,
-          total: newCount,
-          page,
-          pages: Math.ceil(newCount / limit),
-        };
-
-        await this.cacheManager.set(cacheKey, result, 1000 * 60 * 15);
-
-        return result;
-      }
 
       const result = {
         data: topics,
@@ -135,20 +97,15 @@ export class SearchDeliveryService {
     }
   }
 
-  private getCacheKeyLatestNews = (
-    language: string,
-    limit: number,
-    topic: string,
-  ) => `latestNews:${language}-${limit}-${topic || 'all'}`;
-
   async latestNews(
     language: string,
     limit: number,
     topic: SupportedTopicsDto | '' = '',
   ): Promise<TrendingTopicsDBResponseDto> {
-    const cacheKey = this.getCacheKeyLatestNews(language, limit, topic);
-    // const cachedResponse = await this.getTrendingTopicsFromCache(cacheKey);
-    // if (cachedResponse) return cachedResponse;
+    const cacheKey = CACHE_KEYS.LATEST_NEWS(language, limit, topic);
+    const cachedResponse =
+      await this.getCacheData<TrendingTopicsDBResponseDto>(cacheKey);
+    if (cachedResponse) return cachedResponse;
 
     try {
       const whereCondition: any = { language };
@@ -179,10 +136,16 @@ export class SearchDeliveryService {
   }
 
   // TODO: обращаться сначала к репо перед data fetcher
+
   async searchArticles(
     query: string,
     language: string,
   ): Promise<SearchArticlesDto[]> {
+    const cacheKey = CACHE_KEYS.SEARCH_ARTICLES(query, language);
+    const cachedResponse =
+      await this.getCacheData<SearchArticlesDto[]>(cacheKey);
+    if (cachedResponse) return cachedResponse;
+
     try {
       const articles = await lastValueFrom(
         this.dataFetcherClient.send<ServiceResponseDto<SearchArticlesDto[]>>(
@@ -193,6 +156,8 @@ export class SearchDeliveryService {
           },
         ),
       );
+
+      await this.cacheManager.set(cacheKey, articles.data, 1000 * 60 * 15);
 
       if (articles.success === false) {
         this.logger.error(`Failed to fetch search articles: ${articles.error}`);
@@ -212,6 +177,17 @@ export class SearchDeliveryService {
     language: string,
     category: string,
   ): Promise<SearchPublishersDto[]> {
+    const cacheKey = CACHE_KEYS.SEARCH_PUBLISHERS(
+      query,
+      language,
+      country,
+      category,
+    );
+
+    const cachedPublishers =
+      await this.getCacheData<SearchPublishersDto[]>(cacheKey);
+    if (cachedPublishers) return cachedPublishers;
+
     try {
       const publishers = await lastValueFrom(
         this.dataFetcherClient.send<ServiceResponseDto<SearchPublishersDto[]>>(
@@ -224,6 +200,8 @@ export class SearchDeliveryService {
           },
         ),
       );
+
+      await this.cacheManager.set(cacheKey, publishers.data, 1000 * 60 * 15);
 
       if (publishers.success === false) {
         this.logger.error(
@@ -250,15 +228,24 @@ export class SearchDeliveryService {
     }
   }
 
-  // TODO: cache
-
   async frequentlyReadNews(limit: number): Promise<FrequentlyReadNewsDto[]> {
+    const cacheKey = CACHE_KEYS.FREQUENTLY_READ_NEWS(limit);
+    const cachedFrequentlyReadNews =
+      await this.getCacheData<FrequentlyReadNewsDto[]>(cacheKey);
+    if (cachedFrequentlyReadNews) return cachedFrequentlyReadNews;
+
     try {
       const frequentlyReadNews = await lastValueFrom(
         this.analyticsClient.send<ServiceResponseDto<FrequentlyReadNewsDto[]>>(
           'frequently_read_news',
           { limit },
         ),
+      );
+
+      await this.cacheManager.set(
+        cacheKey,
+        frequentlyReadNews.data,
+        1000 * 60 * 15,
       );
 
       if (frequentlyReadNews.success === false) {
@@ -278,6 +265,10 @@ export class SearchDeliveryService {
   }
 
   async topAuthors(limit: number): Promise<AuthorStatsDto[]> {
+    const cacheKey = CACHE_KEYS.TOP_AUTHORS(limit);
+    const cachedAuthors = await this.getCacheData<AuthorStatsDto[]>(cacheKey);
+    if (cachedAuthors) return cachedAuthors;
+
     try {
       const authors = await lastValueFrom(
         this.analyticsClient.send<ServiceResponseDto<AuthorStatsDto[]>>(
@@ -285,6 +276,8 @@ export class SearchDeliveryService {
           { limit },
         ),
       );
+
+      await this.cacheManager.set(cacheKey, authors.data, 1000 * 60 * 15);
 
       if (authors.success === false) {
         this.logger.error(`Failed to fetch top authors: ${authors.error}`);

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SearchDeliveryService } from './search-delivery.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { TrendingTopic } from './entities/trending-topic.entity';
-import { DATA_FETCHER_SERVICE } from './constants/services';
+import { DATA_FETCHER_SERVICE } from './constants/services.constant';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Repository } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';

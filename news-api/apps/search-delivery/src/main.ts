@@ -3,7 +3,7 @@ import { SearchDeliveryModule } from './search-delivery.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RmqService } from '@app/rmq';
-import { SEARCH_DELIVERY_SERVICE } from './constants/services';
+import { SEARCH_DELIVERY_SERVICE } from './constants/services.constant';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 async function bootstrap() {

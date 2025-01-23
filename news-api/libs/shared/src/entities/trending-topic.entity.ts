@@ -5,10 +5,12 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { Publisher } from './publisher.entity';
 import { NewsClick } from './news-clicks.entity';
 
+@Unique(['title', 'url', 'date'])
 @Entity()
 export class TrendingTopic {
   @PrimaryGeneratedColumn()

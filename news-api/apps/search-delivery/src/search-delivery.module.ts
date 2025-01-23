@@ -8,7 +8,7 @@ import {
   ANALYTICS_SERVICE,
   DATA_FETCHER_SERVICE,
   SEARCH_DELIVERY_SERVICE,
-} from './constants/services';
+} from './constants/services.constant';
 import { DbModule } from '@app/db';
 import { RedisModule } from '@app/redis';
 import { SharedModule } from '@app/shared';

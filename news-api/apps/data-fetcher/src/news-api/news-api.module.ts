@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { NewsApiService } from './news-api.service';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RedisModule } from '@app/redis';
 import { RmqModule } from '@app/rmq';
 import { SEARCH_DELIVERY_SERVICE } from '../constants/services';
+import { ScheduleModule } from '@nestjs/schedule';
+import { DataFetcherModule } from '../data-fetcher/data-fetcher.module';
 
 @Module({
   imports: [
@@ -19,8 +20,9 @@ import { SEARCH_DELIVERY_SERVICE } from '../constants/services';
       }),
       inject: [ConfigService],
     }),
-    RedisModule,
     RmqModule.register({ name: SEARCH_DELIVERY_SERVICE }),
+    ScheduleModule.forRoot(),
+    forwardRef(() => DataFetcherModule),
   ],
   controllers: [],
   providers: [NewsApiService],

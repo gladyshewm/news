@@ -5,7 +5,6 @@ import { DbModule } from '@app/db';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { NewsApiModule } from '../news-api/news-api.module';
-import { TrendingTopicRepository } from './trending-topic.repository';
 import { RmqModule } from '@app/rmq';
 import { DATA_FETCHER_SERVICE } from '../constants/services';
 import { SharedModule } from '@app/shared';
@@ -35,6 +34,7 @@ import { SharedModule } from '@app/shared';
     NewsApiModule,
   ],
   controllers: [DataFetcherController],
-  providers: [DataFetcherService, TrendingTopicRepository],
+  providers: [DataFetcherService],
+  exports: [DataFetcherService],
 })
 export class DataFetcherModule {}
