@@ -61,12 +61,14 @@ const LatestNewsPage = () => {
               <NewsBlock key={news.id} topic={news} />
             ))}
           </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            setCurrentPage={setCurrentPage}
-            maxPageButtons={MAX_PAGE_BUTTONS}
-          />
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              setCurrentPage={setCurrentPage}
+              maxPageButtons={MAX_PAGE_BUTTONS}
+            />
+          )}
         </>
       )}
     </div>

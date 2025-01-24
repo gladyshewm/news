@@ -4,6 +4,7 @@
   max-width: 1200px;
   min-height: 100%;
 
+
   & .loader-container {
     position: absolute;
     top: 50%;

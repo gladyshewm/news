@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './TopAuthors.css';
 import { useEffect, useState } from 'react';
 import { AuthorStats } from '../../types';
@@ -17,6 +17,9 @@ const TopAuthors = ({ limit }: TopAuthorsProps) => {
   const [loadedThumbnails, setLoadedThumbnails] = useState<Set<string>>(
     new Set(),
   );
+  const { language = 'en' } = useParams<{
+    language: string;
+  }>();
 
   useEffect(() => {
     searchService
@@ -29,7 +32,7 @@ const TopAuthors = ({ limit }: TopAuthorsProps) => {
     <div className="top-authors">
       <header>
         <h2>Top Authors</h2>
-        <Link to={`#`}>See all</Link>
+        <Link to={`/${language}/top-authors`}>See all</Link>
       </header>
       <div className="content">
         {isLoading ? (

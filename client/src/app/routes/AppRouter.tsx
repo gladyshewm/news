@@ -9,6 +9,7 @@ import TopicPage from '../../pages/TopicPage/TopicPage';
 import AppLayout from '../../layouts/AppLayout/AppLayout';
 import LatestNewsPage from '../../pages/LatestNewsPage/LatestNewsPage';
 import FrequentlyReadTopicsPage from '../../pages/FrequentlyReadTopicsPage/FrequentlyReadTopicsPage';
+import TopAuthorsPage from '../../pages/TopAuthorsPage/TopAuthorsPage';
 
 const AppRouter = () => {
   const routes: RouteObject[] = [
@@ -30,6 +31,10 @@ const AppRouter = () => {
         {
           path: ':language/:topic/frequently-read',
           element: <FrequentlyReadTopicsPage />,
+        },
+        {
+          path: ':language/top-authors',
+          element: <TopAuthorsPage />,
         },
       ],
     },

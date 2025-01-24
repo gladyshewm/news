@@ -9,6 +9,7 @@ import { EyeIcon } from '../../icons';
 import Pagination from '../../features/Pagination/Pagination';
 
 const FrequentlyReadTopicsPage = () => {
+  const LIMIT = 100;
   const [frequentlyReadNews, setFrequentlyReadNews] = useState<
     FrequentlyReadNews[]
   >([]);
@@ -26,7 +27,7 @@ const FrequentlyReadTopicsPage = () => {
 
   useEffect(() => {
     searchService
-      .getFrequentlyReadNews(100)
+      .getFrequentlyReadNews(LIMIT)
       .then((news) => {
         setFrequentlyReadNews(news);
       })
@@ -69,12 +70,14 @@ const FrequentlyReadTopicsPage = () => {
               />
             ))}
           </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            setCurrentPage={setCurrentPage}
-            maxPageButtons={MAX_PAGE_BUTTONS}
-          />
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              setCurrentPage={setCurrentPage}
+              maxPageButtons={MAX_PAGE_BUTTONS}
+            />
+          )}
         </>
       )}
     </div>
