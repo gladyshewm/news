@@ -5,12 +5,12 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { DbModule } from '@app/db';
 import { SharedModule } from '@app/shared';
-import { RedisModule } from '@app/redis';
 import { RmqModule } from '@app/rmq';
 import {
   ANALYTICS_SERVICE,
   SEARCH_DELIVERY_SERVICE,
-} from './constants/services';
+} from './constants/services.constant';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -32,9 +32,9 @@ import {
     }),
     DbModule,
     SharedModule,
-    RedisModule,
     RmqModule.register({ name: ANALYTICS_SERVICE }),
     RmqModule.register({ name: SEARCH_DELIVERY_SERVICE }),
+    ScheduleModule.forRoot(),
   ],
   controllers: [AnalyticsController],
   providers: [AnalyticsService],

@@ -1,8 +1,8 @@
 import {
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
+  OnModuleInit,
 } from '@nestjs/common';
 import {
   AuthorStat,
@@ -10,19 +10,19 @@ import {
   CreateNewsClickDto,
   FrequentlyReadNewsDto,
   NewsClick,
+  Publisher,
   TrendingTopic,
 } from '@app/shared';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 import { RmqContext } from '@nestjs/microservices';
 import { RmqService } from '@app/rmq';
 import { FrequentlyReadNewsPayload } from './dto/frequently-read-news-payload.dto';
 import { TopAuthorsPayload } from './dto/top-authors-payload.dto';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
-export class AnalyticsService {
+export class AnalyticsService implements OnModuleInit {
   private readonly logger = new Logger(AnalyticsService.name);
 
   constructor(
@@ -32,9 +32,78 @@ export class AnalyticsService {
     private trendingTopicRepository: Repository<TrendingTopic>,
     @InjectRepository(AuthorStat)
     private authorStatRepository: Repository<AuthorStat>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @InjectRepository(Publisher)
+    private publisherRepository: Repository<Publisher>,
     private readonly rmqService: RmqService,
   ) {}
+
+  async onModuleInit() {
+    await this.initializeAuthorStats();
+  }
+
+  async initializeAuthorStats(): Promise<void> {
+    this.logger.log('Starting initialization of author_stats...');
+
+    try {
+      const publishers = await this.publisherRepository.find();
+      const existingStats = await this.authorStatRepository.find();
+
+      const existingPublisherIds = new Set(
+        existingStats.map((stat) => stat.publisherId),
+      );
+
+      const newAuthorStats = publishers
+        .filter((publisher) => !existingPublisherIds.has(publisher.id))
+        .map((publisher) => {
+          return this.authorStatRepository.create({
+            publisherId: publisher.id,
+            totalArticles: 1, // CRON обновит позже
+            totalClicks: 0,
+            lastUpdated: new Date(),
+          });
+        });
+
+      if (newAuthorStats.length > 0) {
+        await this.authorStatRepository.save(newAuthorStats);
+        this.logger.log(`Inserted ${newAuthorStats.length} new author stats.`);
+      } else {
+        this.logger.log('No new author stats to insert.');
+      }
+    } catch (error) {
+      this.logger.error(`Failed to initialize author stats: ${error.message}`);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async updateTotalArticles(): Promise<void> {
+    this.logger.log('Starting totalArticles update...');
+
+    // select count(*) from trending_topic tt left join publisher p on tt."publisherId" = p.id where p.name = 'Forbes';
+    try {
+      const authors = await this.authorStatRepository.find();
+
+      for (const author of authors) {
+        const publisherId = author.publisherId;
+
+        const totalArticles = await this.trendingTopicRepository.count({
+          where: {
+            publisher: { id: publisherId },
+          },
+        });
+
+        author.totalArticles = totalArticles;
+        author.lastUpdated = new Date();
+
+        await this.authorStatRepository.save(author);
+        this.logger.log(
+          `Updated articles for publisherId ${publisherId}: ${totalArticles}`,
+        );
+      }
+      this.logger.log('Total articles successfully updated');
+    } catch (error) {
+      this.logger.error(`Failed to update totalArticles: ${error.message}`);
+    }
+  }
 
   async registerClick(
     createNewsClickDto: CreateNewsClickDto,
@@ -73,8 +142,6 @@ export class AnalyticsService {
         });
         await this.authorStatRepository.save(newStat);
       }
-
-      // return newsClick;
     } catch (error) {
       this.logger.error(`Failed to register click: ${error.message}`);
       throw new Error(`Failed to register click: ${error.message}`);
@@ -84,12 +151,6 @@ export class AnalyticsService {
   }
 
   async getFrequentlyReadNews(limit: number): Promise<FrequentlyReadNewsDto[]> {
-    // const cacheKey = `frequently_read_news_${limit}`;
-    // const cached =
-    //   await this.cacheManager.get<FrequentlyReadNewsDto[]>(cacheKey);
-
-    // if (cached) return cached;
-
     try {
       const { entities: news, raw } = await this.trendingTopicRepository
         .createQueryBuilder('trending_topic')
@@ -132,8 +193,6 @@ export class AnalyticsService {
         clicksCount: parseInt(raw[idx].clicks_count),
       }));
 
-      // await this.cacheManager.set(cacheKey, frequentlyReadNews, 1000 * 60 * 15);
-
       return frequentlyReadNews;
     } catch (error) {
       this.logger.error(
@@ -164,11 +223,6 @@ export class AnalyticsService {
   }
 
   async getTopAuthors(limit: number): Promise<AuthorStatsDto[]> {
-    // const cacheKey = `top_authors_${limit}`;
-    // const cached = await this.cacheManager.get<AuthorStatsDto[]>(cacheKey);
-
-    // if (cached) return cached;
-
     try {
       const { entities: authors } = await this.authorStatRepository
         .createQueryBuilder('author_stat')
@@ -196,13 +250,6 @@ export class AnalyticsService {
         .orderBy('author_stat.totalClicks', 'DESC')
         .limit(limit)
         .getRawAndEntities();
-
-      // const topAuthors = authors.map((author) => ({
-      //   ...author,
-      //   publisher: author.publisher,
-      // }));
-
-      // await this.cacheManager.set(cacheKey, authors, 1000 * 60 * 15);
 
       return authors;
     } catch (error) {

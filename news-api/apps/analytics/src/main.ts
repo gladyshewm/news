@@ -3,7 +3,7 @@ import { AnalyticsModule } from './analytics.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { RmqService } from '@app/rmq';
-import { ANALYTICS_SERVICE } from './constants/services';
+import { ANALYTICS_SERVICE } from './constants/services.constant';
 
 async function bootstrap() {
   const app = await NestFactory.create(AnalyticsModule);

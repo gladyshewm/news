@@ -7,8 +7,6 @@ import {
 } from '@app/shared';
 import { Request } from 'express';
 
-// TODO: добавить CRON-задачи
-
 @Controller('search-delivery')
 export class SearchDeliveryController {
   constructor(private readonly searchDeliveryService: SearchDeliveryService) {}

@@ -3,7 +3,7 @@ import { NewsApiService } from './news-api.service';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RmqModule } from '@app/rmq';
-import { SEARCH_DELIVERY_SERVICE } from '../constants/services';
+import { SEARCH_DELIVERY_SERVICE } from '../constants/services.constant';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DataFetcherModule } from '../data-fetcher/data-fetcher.module';
 
