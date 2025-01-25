@@ -5,6 +5,7 @@ import { PhotoIcon } from '../../icons';
 import { formatTopicDate } from '../../utils/formatDate';
 import { Topic } from '../../types';
 import { searchService } from '../../services/searchService';
+import TopicModal from '../TopicModal/TopicModal';
 
 interface NewsBlockProps {
   topic: Topic;
@@ -15,13 +16,18 @@ const NewsBlock = ({ topic, extraHeaderContent }: NewsBlockProps) => {
   const [loadedThumbnails, setLoadedThumbnails] = useState<Set<string>>(
     new Set(),
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClick = async () => {
     await searchService.registerClick(topic.id);
   };
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
   return (
-    <div className="news-block">
+    <div className="news-block" onClick={handleOpenModal}>
       <div className="thumbnail">
         {isImageLoaded(loadedThumbnails, topic.thumbnail) ? (
           <PhotoIcon />
@@ -75,6 +81,9 @@ const NewsBlock = ({ topic, extraHeaderContent }: NewsBlockProps) => {
           </a>
         </footer>
       </div>
+      {isModalOpen && (
+        <TopicModal topic={topic} onClose={() => setIsModalOpen(false)} />
+      )}
     </div>
   );
 };

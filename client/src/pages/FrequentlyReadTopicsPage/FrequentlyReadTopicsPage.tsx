@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './FrequentlyReadTopicsPage.css';
-import Loader from '../../components/Loader/Loader';
+import Loader from '../../features/Loader/Loader';
 import { Link } from 'react-router-dom';
 import { FrequentlyReadNews } from '../../types';
 import { searchService } from '../../services/searchService';

@@ -4,7 +4,7 @@ import NewsBlock from '../../features/NewsBlock/NewsBlock';
 import { Topic } from '../../types';
 import { useEffect, useState } from 'react';
 import { searchService } from '../../services/searchService';
-import Loader from '../../components/Loader/Loader';
+import Loader from '../../features/Loader/Loader';
 import { formatTopic } from '../../utils/formatTopic';
 
 interface LatestNewsProps {

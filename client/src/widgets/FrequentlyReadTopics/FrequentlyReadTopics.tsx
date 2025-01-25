@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { searchService } from '../../services/searchService';
 import { FrequentlyReadNews } from '../../types';
 import NewsBlock from '../../features/NewsBlock/NewsBlock';
-import Loader from '../../components/Loader/Loader';
+import Loader from '../../features/Loader/Loader';
 
 interface FrequentlyReadTopicsProps {
   limit: number;

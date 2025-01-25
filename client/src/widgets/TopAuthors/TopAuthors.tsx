@@ -3,7 +3,7 @@ import './TopAuthors.css';
 import { useEffect, useState } from 'react';
 import { AuthorStats } from '../../types';
 import { searchService } from '../../services/searchService';
-import Loader from '../../components/Loader/Loader';
+import Loader from '../../features/Loader/Loader';
 import { handleImageError, isImageLoaded } from '../../utils/isImageLoaded';
 import { PhotoIcon } from '../../icons';
 

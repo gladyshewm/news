@@ -3,7 +3,7 @@ import './TopicPage.css';
 import { useEffect, useState } from 'react';
 import { Topic } from '../../types';
 import { searchService } from '../../services/searchService';
-import Loader from '../../components/Loader/Loader';
+import Loader from '../../features/Loader/Loader';
 import TrendingTopics from '../../widgets/TrendingTopics/TrendingTopics';
 import { formatTopic } from '../../utils/formatTopic';
 import LatestNews from '../../widgets/LatestNews/LatestNews';

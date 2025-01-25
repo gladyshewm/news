@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './TopAuthorsPage.css';
-import Loader from '../../components/Loader/Loader';
+import Loader from '../../features/Loader/Loader';
 import { Link } from 'react-router-dom';
 import { searchService } from '../../services/searchService';
 import { AuthorStats } from '../../types';

@@ -3,7 +3,7 @@ import './HomePage.css';
 import TrendingTopics from '../../widgets/TrendingTopics/TrendingTopics';
 import { Topic } from '../../types';
 import { searchService } from '../../services/searchService';
-import Loader from '../../components/Loader/Loader';
+import Loader from '../../features/Loader/Loader';
 import LatestNews from '../../widgets/LatestNews/LatestNews';
 import TopAuthors from '../../widgets/TopAuthors/TopAuthors';
 import FrequentlyReadTopics from '../../widgets/FrequentlyReadTopics/FrequentlyReadTopics';
