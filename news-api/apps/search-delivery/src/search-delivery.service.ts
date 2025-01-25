@@ -17,10 +17,11 @@ import {
   SearchArticlesDto,
   SearchPublishersDto,
   ServiceResponseDto,
-  SupportedTopicsDto,
   TrendingTopic,
 } from '@app/shared';
 import { CACHE_KEYS } from './constants/cache-keys.constant';
+import { TrendingTopicsQueryDto } from './dto/trending-topics-query.dto';
+import { LatestNewsQueryDto } from './dto/latest-news-query.dto';
 
 @Injectable()
 export class SearchDeliveryService {
@@ -49,13 +50,10 @@ export class SearchDeliveryService {
   }
 
   async trendingTopics(
-    language: string,
-    topic: SupportedTopicsDto,
-    page: number,
-    limit: number,
-    sort: string,
-    country?: string,
+    query: TrendingTopicsQueryDto,
   ): Promise<TrendingTopicsDBResponseDto> {
+    const { language, topic, page, limit, sort, country, publisher } = query;
+
     const cacheKey = CACHE_KEYS.TRENDING_TOPICS(
       language,
       topic,
@@ -63,6 +61,7 @@ export class SearchDeliveryService {
       limit,
       sort,
       country,
+      publisher,
     );
 
     const cachedResponse =
@@ -70,8 +69,10 @@ export class SearchDeliveryService {
     if (cachedResponse) return cachedResponse;
 
     try {
-      const whereCondition: any = { language, topicId: topic };
+      const whereCondition: any = {};
+      if (topic) whereCondition.topicId = topic;
       if (country) whereCondition.country = country;
+      if (publisher) whereCondition.publisher = { name: publisher };
 
       const [topics, count] = await this.trendingTopicRepo.findAndCount({
         where: whereCondition,
@@ -98,10 +99,10 @@ export class SearchDeliveryService {
   }
 
   async latestNews(
-    language: string,
-    limit: number,
-    topic: SupportedTopicsDto | '' = '',
+    query: LatestNewsQueryDto,
   ): Promise<TrendingTopicsDBResponseDto> {
+    const { language, limit, topic } = query;
+
     const cacheKey = CACHE_KEYS.LATEST_NEWS(language, limit, topic);
     const cachedResponse =
       await this.getCacheData<TrendingTopicsDBResponseDto>(cacheKey);

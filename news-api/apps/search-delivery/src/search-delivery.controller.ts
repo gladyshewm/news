@@ -1,42 +1,22 @@
 import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
 import { SearchDeliveryService } from './search-delivery.service';
-import {
-  AuthorStatsDto,
-  FrequentlyReadNewsDto,
-  SupportedTopicsDto,
-} from '@app/shared';
+import { AuthorStatsDto, FrequentlyReadNewsDto } from '@app/shared';
 import { Request } from 'express';
+import { TrendingTopicsQueryDto } from './dto/trending-topics-query.dto';
+import { LatestNewsQueryDto } from './dto/latest-news-query.dto';
 
 @Controller('search-delivery')
 export class SearchDeliveryController {
   constructor(private readonly searchDeliveryService: SearchDeliveryService) {}
 
   @Get('trending-topics')
-  async trendingTopics(
-    @Query('language') language: string = 'ru',
-    @Query('topic') topic: SupportedTopicsDto = 'General',
-    @Query('country') country: string = '',
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    @Query('sort') sort: string = 'date',
-  ) {
-    return this.searchDeliveryService.trendingTopics(
-      language,
-      topic,
-      page,
-      limit,
-      sort,
-      country,
-    );
+  async trendingTopics(@Query() query: TrendingTopicsQueryDto) {
+    return this.searchDeliveryService.trendingTopics(query);
   }
 
   @Get('latest-news')
-  async latestNews(
-    @Query('language') language: string = 'ru',
-    @Query('limit') limit: number = 10,
-    @Query('topic') topic: SupportedTopicsDto | '' = '',
-  ) {
-    return this.searchDeliveryService.latestNews(language, limit, topic);
+  async latestNews(@Query() query: LatestNewsQueryDto) {
+    return this.searchDeliveryService.latestNews(query);
   }
 
   @Get('search/articles')

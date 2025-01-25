@@ -8,7 +8,7 @@ import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.int
 
 async function bootstrap() {
   const app = await NestFactory.create(SearchDeliveryModule);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice(rmqService.getOptions(SEARCH_DELIVERY_SERVICE));

@@ -47,7 +47,7 @@ export class NewsApiService {
       ];
 
       for (const topic of topicsList) {
-        const topics = await this.getTrendingTopics(topic, 'en');
+        const topics = await this.getTrendingTopics(topic, 'en'); // TODO: другие языки???
         await this.dataFetcherService.saveTopics(topics);
       }
 
