@@ -1,6 +1,6 @@
 import './LatestNewsPage.css';
 import { Link, useParams } from 'react-router-dom';
-import { Topic } from '../../types';
+import { GetLatestNews, Topic } from '../../types';
 import { useEffect, useState } from 'react';
 import { searchService } from '../../services/searchService';
 import Loader from '../../features/Loader/Loader';
@@ -21,13 +21,14 @@ const LatestNewsPage = () => {
     if (!language || !topic) return;
 
     let formattedTopic = formatTopic(topic);
+    const query: GetLatestNews = {
+      language,
+      limit: 100,
+      topic: formattedTopic === 'General' ? '' : formattedTopic,
+    };
 
     searchService
-      .getLatestNews(
-        language,
-        100,
-        formattedTopic === 'General' ? '' : formattedTopic,
-      )
+      .getLatestNews(query)
       .then((data) => setLatestNews(data))
       .then(() => setIsLoading(false));
   }, [language, topic]);

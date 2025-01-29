@@ -18,7 +18,8 @@ const NewsBlock = ({ topic, extraHeaderContent }: NewsBlockProps) => {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleClick = async () => {
+  const handleClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     await searchService.registerClick(topic.id);
   };
 
@@ -75,7 +76,7 @@ const NewsBlock = ({ topic, extraHeaderContent }: NewsBlockProps) => {
             href={topic.url}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={handleClick}
+            onClick={(e) => handleClick(e)}
           >
             Read more
           </a>

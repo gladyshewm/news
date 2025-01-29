@@ -1,7 +1,10 @@
 import {
   AuthorStats,
   FrequentlyReadNews,
-  SupportedTopics,
+  GetFrequentlyReadNews,
+  GetLatestNews,
+  GetTopAuthors,
+  GetTrendingTopics,
   Topic,
 } from '../types';
 
@@ -14,21 +17,15 @@ class SearchService {
     this.baseUrl = baseUrl;
   }
 
-  async getTrendingTopics(
-    language: string,
-    topic: SupportedTopics,
-    page: number = 1,
-    limit: number = 10,
-    sort: string = 'date',
-    country?: string,
-  ): Promise<Topic[]> {
+  async getTrendingTopics(query: GetTrendingTopics): Promise<Topic[]> {
+    const { language, topic, page, limit, publisher, sort, country } = query;
     try {
       const response = await fetch(
         `${
           this.baseUrl
-        }/search-delivery/trending-topics?language=${language}&topic=${topic}&page=${page}&limit=${limit}&sort=${sort}${
-          country ? `&country=${country}` : ''
-        }`,
+        }/search-delivery/trending-topics?language=${language}&topic=${topic}&page=${page}&limit=${limit}&sort=${sort}${`&country=${
+          country || ''
+        }&publisher=${publisher || ''}`}`,
       );
       const { data: topics }: { data: Topic[] } = await response.json();
       return topics;
@@ -38,11 +35,8 @@ class SearchService {
     }
   }
 
-  async getLatestNews(
-    language: string,
-    limit: number,
-    topic: string = '',
-  ): Promise<Topic[]> {
+  async getLatestNews(query: GetLatestNews): Promise<Topic[]> {
+    const { language, limit, topic } = query;
     try {
       const response = await fetch(
         `${this.baseUrl}/search-delivery/latest-news?language=${language}&limit=${limit}&topic=${topic}`,
@@ -56,8 +50,9 @@ class SearchService {
   }
 
   async getFrequentlyReadNews(
-    limit: number = 10,
+    query: GetFrequentlyReadNews,
   ): Promise<FrequentlyReadNews[]> {
+    const { limit } = query;
     try {
       const response = await fetch(
         `${this.baseUrl}/search-delivery/analytics/frequently-read-news?limit=${limit}`,
@@ -70,7 +65,8 @@ class SearchService {
     }
   }
 
-  async getTopAuthors(limit: number = 5): Promise<AuthorStats[]> {
+  async getTopAuthors(query: GetTopAuthors): Promise<AuthorStats[]> {
+    const { limit } = query;
     try {
       const response = await fetch(
         `${this.baseUrl}/search-delivery/analytics/top-authors?limit=${limit}`,

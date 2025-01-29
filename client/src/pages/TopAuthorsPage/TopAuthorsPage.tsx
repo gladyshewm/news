@@ -29,7 +29,7 @@ const TopAuthorsPage = () => {
 
   useEffect(() => {
     searchService
-      .getTopAuthors(LIMIT)
+      .getTopAuthors({ limit: LIMIT })
       .then((data) => setTopAuthors(data))
       .finally(() => setIsLoading(false));
   }, []);
@@ -83,8 +83,11 @@ const TopAuthorsPage = () => {
                 </div>
                 <div className="author-stats">
                   <div>
-                    Total Articles: <span>{author.totalArticles}</span>
-                    <NewspaperIcon />
+                    <Link to={`#`}>
+                      {/* /en/authors/${author.id} */}
+                      Total Articles: <span>{author.totalArticles}</span>
+                      <NewspaperIcon />
+                    </Link>
                   </div>
                   <div>
                     Total Views: <span>{author.totalClicks}</span>

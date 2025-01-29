@@ -27,7 +27,7 @@ const FrequentlyReadTopicsPage = () => {
 
   useEffect(() => {
     searchService
-      .getFrequentlyReadNews(LIMIT)
+      .getFrequentlyReadNews({ limit: LIMIT })
       .then((news) => {
         setFrequentlyReadNews(news);
       })

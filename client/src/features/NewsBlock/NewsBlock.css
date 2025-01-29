@@ -1,7 +1,7 @@
 .news-block {
   display: flex;
   flex-direction: column;
-  height: 30rem;
+  height: 32.8rem;
   padding: 1.4rem;
   transition: box-shadow 0.3s ease-in-out;
 
@@ -10,7 +10,8 @@
   }
 
   & .thumbnail {
-    height: 15rem;
+    max-height: 15rem;
+    min-height: 15rem;
 
     & img {
       height: 100%;

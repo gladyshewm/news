@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import './LatestNews.css';
 import NewsBlock from '../../features/NewsBlock/NewsBlock';
-import { Topic } from '../../types';
+import { GetLatestNews, Topic } from '../../types';
 import { useEffect, useState } from 'react';
 import { searchService } from '../../services/searchService';
 import Loader from '../../features/Loader/Loader';
@@ -22,9 +22,10 @@ const LatestNews = ({ limit }: LatestNewsProps) => {
 
   useEffect(() => {
     const formattedTopic = formatTopic(topic);
+    const query: GetLatestNews = { language, limit, topic: formattedTopic };
 
     searchService
-      .getLatestNews(language, limit, formattedTopic)
+      .getLatestNews(query)
       .then((data) => setLatestNews(data))
       .finally(() => setIsLoading(false));
   }, [language, limit, topic]);

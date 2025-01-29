@@ -22,7 +22,7 @@ const FrequentlyReadTopics = ({ limit }: FrequentlyReadTopicsProps) => {
 
   useEffect(() => {
     searchService
-      .getFrequentlyReadNews(limit)
+      .getFrequentlyReadNews({ limit })
       .then((data) => setFrequentlyReadNews(data))
       .finally(() => setIsLoading(false));
   }, [limit]);

@@ -23,7 +23,7 @@ const TopAuthors = ({ limit }: TopAuthorsProps) => {
 
   useEffect(() => {
     searchService
-      .getTopAuthors(limit)
+      .getTopAuthors({ limit })
       .then((data) => setTopAuthors(data))
       .finally(() => setIsLoading(false));
   }, [limit]);

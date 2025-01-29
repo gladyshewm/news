@@ -3,3 +3,7 @@ export * from './trending-topics';
 export * from './publisher';
 export * from './frequently-read-news';
 export * from './author-stats';
+export * from './get-trending-topics';
+export * from './get-latest-news';
+export * from './get-frequently-read-news';
+export * from './get-top-authors';

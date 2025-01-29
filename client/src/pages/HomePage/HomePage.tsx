@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './HomePage.css';
 import TrendingTopics from '../../widgets/TrendingTopics/TrendingTopics';
-import { Topic } from '../../types';
+import { GetTrendingTopics, Topic } from '../../types';
 import { searchService } from '../../services/searchService';
 import Loader from '../../features/Loader/Loader';
 import LatestNews from '../../widgets/LatestNews/LatestNews';
@@ -13,8 +13,15 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const query: GetTrendingTopics = {
+      language: 'en',
+      topic: 'General',
+      page: 1,
+      limit: 5,
+    };
+
     searchService
-      .getTrendingTopics('en', 'General', 1, 5, 'date')
+      .getTrendingTopics(query)
       .finally(() => setIsLoading(false))
       .then((data) => setTopics(data));
   }, []);

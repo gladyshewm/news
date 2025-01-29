@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import './TopicPage.css';
 import { useEffect, useState } from 'react';
-import { Topic } from '../../types';
+import { GetTrendingTopics, Topic } from '../../types';
 import { searchService } from '../../services/searchService';
 import Loader from '../../features/Loader/Loader';
 import TrendingTopics from '../../widgets/TrendingTopics/TrendingTopics';
@@ -20,16 +20,17 @@ const TopicPage = () => {
   useEffect(() => {
     if (!topic || !language) return;
     const formattedTopic = formatTopic(topic);
+    const query: GetTrendingTopics = {
+      language,
+      topic: formattedTopic,
+      page: 1,
+      limit: 5,
+      sort: 'date',
+      country: country ?? undefined,
+    };
 
     searchService
-      .getTrendingTopics(
-        language,
-        formattedTopic,
-        1,
-        5,
-        'date',
-        country ?? undefined,
-      )
+      .getTrendingTopics(query)
       .then((data) => setTopics(data))
       .finally(() => setIsLoading(false));
   }, [topic, language, country]);
