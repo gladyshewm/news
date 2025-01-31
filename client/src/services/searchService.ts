@@ -19,13 +19,19 @@ class SearchService {
 
   async getTrendingTopics(query: GetTrendingTopics): Promise<Topic[]> {
     const { language, topic, page, limit, publisher, sort, country } = query;
+    const params = new URLSearchParams({
+      language: language || '',
+      page: page.toString(),
+      limit: limit.toString(),
+      sort: sort || '',
+      country: country || '',
+    });
+    topic?.forEach((t) => params.append('topic', t));
+    publisher?.forEach((p) => params.append('publisher', p));
+
     try {
       const response = await fetch(
-        `${
-          this.baseUrl
-        }/search-delivery/trending-topics?language=${language}&topic=${topic}&page=${page}&limit=${limit}&sort=${sort}${`&country=${
-          country || ''
-        }&publisher=${publisher || ''}`}`,
+        `${this.baseUrl}/search-delivery/trending-topics?${params.toString()}`,
       );
       const { data: topics }: { data: Topic[] } = await response.json();
       return topics;

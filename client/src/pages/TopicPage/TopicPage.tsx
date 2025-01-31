@@ -22,7 +22,7 @@ const TopicPage = () => {
     const formattedTopic = formatTopic(topic);
     const query: GetTrendingTopics = {
       language,
-      topic: formattedTopic,
+      topic: [formattedTopic],
       page: 1,
       limit: 5,
       sort: 'date',

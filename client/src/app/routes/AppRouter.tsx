@@ -10,6 +10,7 @@ import AppLayout from '../../layouts/AppLayout/AppLayout';
 import LatestNewsPage from '../../pages/LatestNewsPage/LatestNewsPage';
 import FrequentlyReadTopicsPage from '../../pages/FrequentlyReadTopicsPage/FrequentlyReadTopicsPage';
 import TopAuthorsPage from '../../pages/TopAuthorsPage/TopAuthorsPage';
+import NewsFilterPage from '../../pages/NewsFilterPage/NewsFilterPage';
 
 const AppRouter = () => {
   const routes: RouteObject[] = [
@@ -23,6 +24,10 @@ const AppRouter = () => {
         {
           path: ':language/:topic',
           element: <TopicPage />,
+        },
+        {
+          path: ':language/news-filter',
+          element: <NewsFilterPage />,
         },
         {
           path: ':language/:topic/latest-news',

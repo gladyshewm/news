@@ -15,15 +15,16 @@ const HomePage = () => {
   useEffect(() => {
     const query: GetTrendingTopics = {
       language: 'en',
-      topic: 'General',
+      topic: ['General'],
       page: 1,
       limit: 5,
+      sort: 'date',
     };
 
     searchService
       .getTrendingTopics(query)
-      .finally(() => setIsLoading(false))
-      .then((data) => setTopics(data));
+      .then((data) => setTopics(data))
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (

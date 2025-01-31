@@ -1,0 +1,38 @@
+.custom-select {
+  position: relative;
+  width: 100%;
+
+  & .select-header {
+    background: #eeeeee;
+    color: #555;
+    border: 1px solid #ccc;
+    padding: 0.5rem 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  & .select-options {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    top: 50%;
+    left: 0;
+    list-style-type: none;
+    width: 100%;
+    background: var(--main-background-color);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 10;
+
+    & li {
+      color: #555;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background: #eeeeee;
+      }
+    }
+  }
+}

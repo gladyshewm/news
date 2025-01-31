@@ -1,8 +1,8 @@
 export type GetTrendingTopics = {
   language?: string;
-  topic?: string;
+  topic?: string[];
   country?: string;
-  publisher?: string;
+  publisher?: string[];
   sort?: string;
   page: number;
   limit: number;

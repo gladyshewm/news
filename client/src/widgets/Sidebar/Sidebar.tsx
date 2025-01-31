@@ -7,6 +7,14 @@ const Sidebar = () => {
     <div className="sidebar">
       <h2>CATEGORIES</h2>
       <ul className="nav-links">
+        <li key="news-filter">
+          <NavLink
+            to="en/news-filter" /* to="/${language}/news-filter" */
+            className={({ isActive }) => (isActive ? 'active' : '')}
+          >
+            News Filter
+          </NavLink>
+        </li>
         {CATEGORIES.map((category) => {
           const { language, country } = CATEGORY_CONFIG[category] || {
             language: 'en',
@@ -27,9 +35,6 @@ const Sidebar = () => {
           );
         })}
       </ul>
-      {/* <div className="search">
-        <MagnifyingGlassIcon />
-      </div> */}
     </div>
   );
 };
