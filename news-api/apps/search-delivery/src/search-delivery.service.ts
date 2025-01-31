@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { TrendingTopicsDBResponseDto } from './dto/trending-topics-db-res.dto';
 import {
   ANALYTICS_SERVICE,
@@ -54,14 +54,24 @@ export class SearchDeliveryService {
   ): Promise<TrendingTopicsDBResponseDto> {
     const { language, topic, page, limit, sort, country, publisher } = query;
 
+    const params = new URLSearchParams({
+      language: language || '',
+      page: page.toString(),
+      limit: limit.toString(),
+      sort: sort || '',
+      country: country || '',
+    });
+    topic?.forEach((t) => params.append('topic', t));
+    publisher?.forEach((p) => params.append('publisher', p));
+
     const cacheKey = CACHE_KEYS.TRENDING_TOPICS(
       language,
-      topic,
+      params.getAll('topic').join(','),
       page,
       limit,
       sort,
       country,
-      publisher,
+      params.getAll('publisher').join(','),
     );
 
     const cachedResponse =
@@ -70,23 +80,76 @@ export class SearchDeliveryService {
 
     try {
       const whereCondition: any = {};
-      if (topic) whereCondition.topicId = topic;
+      if (topic) whereCondition.topicId = In(topic);
       if (country) whereCondition.country = country;
-      if (publisher) whereCondition.publisher = { name: publisher };
+      if (publisher) whereCondition.publisher = { name: In(publisher) };
 
-      const [topics, count] = await this.trendingTopicRepo.findAndCount({
-        where: whereCondition,
-        // order: { [sort]: 'DESC' },
-        skip: (page - 1) * limit,
-        take: limit,
-        relations: ['publisher'],
-      });
+      // const [topics, count] = await this.trendingTopicRepo.findAndCount({
+      //   where: whereCondition,
+      //   order: { [sort]: 'DESC' },
+      //   skip: (page - 1) * limit,
+      //   take: limit,
+      //   relations: ['publisher', 'newsClicks'],
+      // });
+      const queryBuilder = this.trendingTopicRepo
+        .createQueryBuilder('trending_topic')
+        .leftJoinAndSelect('trending_topic.newsClicks', 'news_click')
+        .leftJoinAndSelect('trending_topic.publisher', 'publisher')
+        .select([
+          'trending_topic',
+          'publisher.id',
+          'publisher.name',
+          'publisher.url',
+          'publisher.favicon',
+          'COUNT(DISTINCT news_click.id) as clicks_count',
+        ])
+        .groupBy('trending_topic.id')
+        .addGroupBy(
+          [
+            'trending_topic.topicId',
+            'trending_topic.title',
+            'trending_topic.url',
+            'trending_topic.excerpt',
+            'trending_topic.thumbnail',
+            'trending_topic.language',
+            'trending_topic.country',
+            'trending_topic.contentLength',
+            'trending_topic.authors',
+            'trending_topic.keywords',
+            'trending_topic.date',
+            'publisher.id',
+            'publisher.name',
+            'publisher.url',
+            'publisher.favicon',
+          ].join(', '),
+        );
+
+      if (topic)
+        queryBuilder.andWhere('trending_topic.topicId IN (:...topics)', {
+          topics: topic,
+        });
+      if (country)
+        queryBuilder.andWhere('trending_topic.country = :country', { country });
+      if (publisher)
+        queryBuilder.andWhere('publisher.name IN (:...publishers)', {
+          publishers: publisher,
+        });
+
+      queryBuilder
+        .orderBy(
+          sort === 'popularity' ? 'clicks_count' : 'trending_topic.date',
+          'DESC',
+        )
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+      const { entities: topics, raw } = await queryBuilder.getRawAndEntities();
 
       const result = {
         data: topics,
-        total: count,
+        total: raw.length,
         page,
-        pages: Math.ceil(count / limit),
+        pages: Math.ceil(raw.length / limit),
       };
 
       await this.cacheManager.set(cacheKey, result, 1000 * 60 * 15);

@@ -1,5 +1,12 @@
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString, Min, Max, IsNumber } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  Min,
+  Max,
+  IsNumber,
+  IsArray,
+} from 'class-validator';
 
 export class TrendingTopicsQueryDto {
   @IsOptional()
@@ -8,15 +15,23 @@ export class TrendingTopicsQueryDto {
 
   @IsOptional()
   @IsString()
-  topic?: string;
+  sort?: string = 'date';
+
+  @IsOptional()
+  @IsArray()
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  @IsString({ each: true })
+  topic?: string[];
 
   @IsOptional()
   @IsString()
   country?: string;
 
   @IsOptional()
-  @IsString()
-  publisher?: string;
+  @IsArray()
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  @IsString({ each: true })
+  publisher?: string[];
 
   @IsOptional()
   @Transform(({ value }) => parseInt(value) || 1)
@@ -30,8 +45,4 @@ export class TrendingTopicsQueryDto {
   @Min(1)
   @Max(100)
   limit: number = 10;
-
-  @IsOptional()
-  @IsString()
-  sort: string = 'date';
 }
