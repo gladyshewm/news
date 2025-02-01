@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { ILike, In, Repository } from 'typeorm';
 import { TrendingTopicsDBResponseDto } from './dto/trending-topics-db-res.dto';
 import {
   ANALYTICS_SERVICE,
@@ -14,14 +14,16 @@ import {
   AuthorStatsDto,
   CreateNewsClickDto,
   FrequentlyReadNewsDto,
+  Publisher,
   SearchArticlesDto,
-  SearchPublishersDto,
   ServiceResponseDto,
   TrendingTopic,
 } from '@app/shared';
 import { CACHE_KEYS } from './constants/cache-keys.constant';
 import { TrendingTopicsQueryDto } from './dto/trending-topics-query.dto';
 import { LatestNewsQueryDto } from './dto/latest-news-query.dto';
+import { SearchPublishersQueryDto } from './dto/search-publishers-query.dto';
+import { PublishersDBResponseDto } from './dto/publishers-db-res.dto';
 
 @Injectable()
 export class SearchDeliveryService {
@@ -30,6 +32,8 @@ export class SearchDeliveryService {
   constructor(
     @InjectRepository(TrendingTopic)
     private readonly trendingTopicRepo: Repository<TrendingTopic>,
+    @InjectRepository(Publisher)
+    private readonly publisherRepo: Repository<Publisher>,
     @Inject(DATA_FETCHER_SERVICE)
     private readonly dataFetcherClient: ClientProxy,
     @Inject(ANALYTICS_SERVICE)
@@ -199,8 +203,6 @@ export class SearchDeliveryService {
     }
   }
 
-  // TODO: обращаться сначала к репо перед data fetcher
-
   async searchArticles(
     query: string,
     language: string,
@@ -235,46 +237,79 @@ export class SearchDeliveryService {
     }
   }
 
+  // async searchPublishers(
+  //   query: string,
+  //   country: string,
+  //   language: string,
+  //   category: string,
+  // ): Promise<SearchPublishersDto[]> {
+  //   const cacheKey = CACHE_KEYS.SEARCH_PUBLISHERS(
+  //     query,
+  //     language,
+  //     country,
+  //     category,
+  //   );
+
+  //   const cachedPublishers =
+  //     await this.getCacheData<SearchPublishersDto[]>(cacheKey);
+  //   if (cachedPublishers) return cachedPublishers;
+
+  //   try {
+  //     const publishers = await lastValueFrom(
+  //       this.dataFetcherClient.send<ServiceResponseDto<SearchPublishersDto[]>>(
+  //         'search_publishers',
+  //         {
+  //           query,
+  //           country,
+  //           language,
+  //           category,
+  //         },
+  //       ),
+  //     );
+
+  //     await this.cacheManager.set(cacheKey, publishers.data, 1000 * 60 * 15);
+
+  //     if (publishers.success === false) {
+  //       this.logger.error(
+  //         `Failed to fetch search publishers: ${publishers.error}`,
+  //       );
+  //       return [];
+  //     }
+
+  //     return publishers.data;
+  //   } catch (error) {
+  //     this.logger.error(`Failed to fetch search publishers: ${error.message}`);
+  //     throw new Error(`Failed to fetch search publishers: ${error.message}`);
+  //   }
+  // }
+
   async searchPublishers(
-    query: string,
-    country: string,
-    language: string,
-    category: string,
-  ): Promise<SearchPublishersDto[]> {
-    const cacheKey = CACHE_KEYS.SEARCH_PUBLISHERS(
-      query,
-      language,
-      country,
-      category,
-    );
+    query: SearchPublishersQueryDto,
+  ): Promise<PublishersDBResponseDto> {
+    const { name } = query;
+    const cacheKey = CACHE_KEYS.SEARCH_PUBLISHERS(name);
 
     const cachedPublishers =
-      await this.getCacheData<SearchPublishersDto[]>(cacheKey);
+      await this.getCacheData<PublishersDBResponseDto>(cacheKey);
     if (cachedPublishers) return cachedPublishers;
 
     try {
-      const publishers = await lastValueFrom(
-        this.dataFetcherClient.send<ServiceResponseDto<SearchPublishersDto[]>>(
-          'search_publishers',
-          {
-            query,
-            country,
-            language,
-            category,
-          },
-        ),
-      );
+      const [publishers, total] = await this.publisherRepo.findAndCount({
+        where: { name: ILike(`%${name}%`) },
+        take: 10,
+        relations: ['authorStats'],
+      });
 
-      await this.cacheManager.set(cacheKey, publishers.data, 1000 * 60 * 15);
+      const result = {
+        data: publishers,
+        total,
+        page: 1,
+        pages: Math.ceil(total / 10),
+      };
 
-      if (publishers.success === false) {
-        this.logger.error(
-          `Failed to fetch search publishers: ${publishers.error}`,
-        );
-        return [];
-      }
+      await this.cacheManager.set(cacheKey, result, 1000 * 60 * 15);
 
-      return publishers.data;
+      return result;
     } catch (error) {
       this.logger.error(`Failed to fetch search publishers: ${error.message}`);
       throw new Error(`Failed to fetch search publishers: ${error.message}`);

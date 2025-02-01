@@ -24,12 +24,13 @@ export const CACHE_KEYS = {
     `latestNews-${language}-${limit}-${topic || 'all'}`,
   SEARCH_ARTICLES: (query: string, language: string) =>
     `searchArticles-${query}-${language}`,
-  SEARCH_PUBLISHERS: (
-    query: string,
-    language: string,
-    country: string,
-    category: string,
-  ) => `searchPublishers-${query}-${country}-${language}-${category}`,
+  // SEARCH_PUBLISHERS: (
+  //   query: string,
+  //   language: string,
+  //   country: string,
+  //   category: string,
+  // ) => `searchPublishers-${query}-${country}-${language}-${category}`,
+  SEARCH_PUBLISHERS: (name: string) => `searchPublishers-${name}`,
   FREQUENTLY_READ_NEWS: (limit: number) => `frequentlyReadNews-${limit}`,
   TOP_AUTHORS: (limit: number) => `topAuthors-${limit}`,
 };

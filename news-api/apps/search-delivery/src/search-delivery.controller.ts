@@ -4,6 +4,7 @@ import { AuthorStatsDto, FrequentlyReadNewsDto } from '@app/shared';
 import { Request } from 'express';
 import { TrendingTopicsQueryDto } from './dto/trending-topics-query.dto';
 import { LatestNewsQueryDto } from './dto/latest-news-query.dto';
+import { SearchPublishersQueryDto } from './dto/search-publishers-query.dto';
 
 @Controller('search-delivery')
 export class SearchDeliveryController {
@@ -28,18 +29,8 @@ export class SearchDeliveryController {
   }
 
   @Get('search/publishers')
-  async searchPublishers(
-    @Query('query') query: string,
-    @Query('country') country: string = '',
-    @Query('language') language: string = '',
-    @Query('category') category: string = '',
-  ) {
-    return this.searchDeliveryService.searchPublishers(
-      query,
-      country,
-      language,
-      category,
-    );
+  async searchPublishers(@Query() query: SearchPublishersQueryDto) {
+    return this.searchDeliveryService.searchPublishers(query);
   }
 
   @Post('analytics/news-click')
