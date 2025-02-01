@@ -5,8 +5,10 @@ import {
   GetLatestNews,
   GetTopAuthors,
   GetTrendingTopics,
+  Publisher,
   Topic,
 } from '../types';
+import { SearchPublishers } from '../types/search-publishers';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
@@ -82,6 +84,20 @@ class SearchService {
     } catch (error) {
       console.error('Error fetching top authors:', error);
       throw new Error('Failed to fetch top authors');
+    }
+  }
+
+  async searchPublishers(query: SearchPublishers): Promise<Publisher[]> {
+    const { name } = query;
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/search-delivery/search/publishers?name=${name}`,
+      );
+      const { data: publishers }: { data: Publisher[] } = await response.json();
+      return publishers;
+    } catch (error) {
+      console.error('Error fetching search publishers:', error);
+      throw new Error('Failed to fetch search publishers');
     }
   }
 

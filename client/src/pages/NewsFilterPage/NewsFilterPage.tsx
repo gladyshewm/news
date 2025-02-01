@@ -1,82 +1,12 @@
-import { CATEGORIES } from '../../constants/category';
 import Loader from '../../features/Loader/Loader';
 import NewsBlock from '../../features/NewsBlock/NewsBlock';
 import Pagination from '../../features/Pagination/Pagination';
-import Select from '../../features/Select/Select';
 import { searchService } from '../../services/searchService';
 import { GetTrendingTopics, Topic } from '../../types';
 import { formatTopic } from '../../utils/formatTopic';
 import './NewsFilterPage.css';
 import { useState } from 'react';
-
-interface NewsFilterPageProps {
-  selectedCategories: string[];
-  setSelectedAuthors: React.Dispatch<React.SetStateAction<string[]>>;
-  sortOption: string;
-  setSortOption: React.Dispatch<React.SetStateAction<string>>;
-  handleCategoryChange: (category: string) => void;
-  handleSubmit: () => void;
-}
-
-const NewsFilterPageHeader = ({
-  selectedCategories,
-  setSelectedAuthors,
-  sortOption,
-  setSortOption,
-  handleCategoryChange,
-  handleSubmit,
-}: NewsFilterPageProps) => {
-  const SORT_OPTIONS = ['Date', 'Popularity'];
-
-  return (
-    <div className="news-filter-page__header">
-      <h1>Filter News</h1>
-      <div className="filter-section__top">
-        <div className="filter-section">
-          <h3>Select Categories</h3>
-          <ul>
-            {CATEGORIES.map((category) => (
-              <li key={category}>
-                <input
-                  type="checkbox"
-                  id={category}
-                  value={category}
-                  checked={selectedCategories.includes(category)}
-                  onChange={() => handleCategoryChange(category)}
-                />
-                <label htmlFor={category}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </label>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="filter-section__bottom">
-        <div className="filter-section">
-          <h3>Select Authors</h3> {/* TODO:  */}
-          <input
-            type="text"
-            placeholder="Type author names..."
-            onChange={(e) => setSelectedAuthors(e.target.value.split(','))}
-          />
-        </div>
-
-        <div className="filter-section">
-          <h3>Sort By</h3>
-          <Select
-            options={SORT_OPTIONS}
-            selectedOption={sortOption}
-            setSelectedOption={setSortOption}
-          />
-        </div>
-      </div>
-
-      <button onClick={handleSubmit}>Apply Filters</button>
-    </div>
-  );
-};
+import NewsFilterPageHeader from './NewsFilterPageHeader/NewsFilterPageHeader';
 
 const NewsFilterPage = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -123,6 +53,7 @@ const NewsFilterPage = () => {
     <div className="news-filter-page">
       <NewsFilterPageHeader
         selectedCategories={selectedCategories}
+        selectedAuthors={selectedAuthors}
         setSelectedAuthors={setSelectedAuthors}
         sortOption={sortOption}
         setSortOption={setSortOption}

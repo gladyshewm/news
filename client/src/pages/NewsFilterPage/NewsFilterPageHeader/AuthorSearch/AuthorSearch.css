@@ -1,0 +1,56 @@
+.filter-section.author-search {
+  position: relative;
+
+  & .filter-section__authors {
+    display: flex;
+    align-items: center;
+
+    & h4 {
+      font-size: 1.5rem;
+      color: #333;
+    }
+
+    & .selected-authors {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-left: 0.5rem;
+
+      & .tag {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #212121;
+        padding: 0.25rem 0.5rem;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          cursor: pointer;
+          background-color: var(--main-background-color);
+        }
+      }
+    }
+  }
+
+  & .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 1rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    background: var(--main-background-color);
+    border: 1px solid #ccc;
+    width: calc(100% - 2rem);
+    overflow-y: auto;
+
+    & li {
+      padding: 0.57rem;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #eee;
+      }
+    }
+  }
+}
