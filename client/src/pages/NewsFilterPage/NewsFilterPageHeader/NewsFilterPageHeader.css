@@ -27,7 +27,7 @@
     min-height: 7rem;
 
     & .filter-section {
-      height: 100%;
+      min-height: 7rem;
     }
 
     & div:first-child {
