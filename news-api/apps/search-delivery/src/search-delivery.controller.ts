@@ -5,6 +5,7 @@ import { Request } from 'express';
 import { TrendingTopicsQueryDto } from './dto/trending-topics-query.dto';
 import { LatestNewsQueryDto } from './dto/latest-news-query.dto';
 import { SearchPublishersQueryDto } from './dto/search-publishers-query.dto';
+import { SearchArticlesQueryDto } from './dto/search-articles-query.dto';
 
 @Controller('search-delivery')
 export class SearchDeliveryController {
@@ -21,11 +22,8 @@ export class SearchDeliveryController {
   }
 
   @Get('search/articles')
-  async searchArticles(
-    @Query('query') query: string,
-    @Query('language') language: string = 'ru',
-  ) {
-    return this.searchDeliveryService.searchArticles(query, language);
+  async searchArticles(@Query() query: SearchArticlesQueryDto) {
+    return this.searchDeliveryService.searchArticles(query);
   }
 
   @Get('search/publishers')

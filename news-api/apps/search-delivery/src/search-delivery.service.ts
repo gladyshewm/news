@@ -24,6 +24,7 @@ import { TrendingTopicsQueryDto } from './dto/trending-topics-query.dto';
 import { LatestNewsQueryDto } from './dto/latest-news-query.dto';
 import { SearchPublishersQueryDto } from './dto/search-publishers-query.dto';
 import { PublishersDBResponseDto } from './dto/publishers-db-res.dto';
+import { SearchArticlesQueryDto } from './dto/search-articles-query.dto';
 
 @Injectable()
 export class SearchDeliveryService {
@@ -204,10 +205,10 @@ export class SearchDeliveryService {
   }
 
   async searchArticles(
-    query: string,
-    language: string,
+    query: SearchArticlesQueryDto,
   ): Promise<SearchArticlesDto[]> {
-    const cacheKey = CACHE_KEYS.SEARCH_ARTICLES(query, language);
+    const { articleQuery, language } = query;
+    const cacheKey = CACHE_KEYS.SEARCH_ARTICLES(articleQuery, language);
     const cachedResponse =
       await this.getCacheData<SearchArticlesDto[]>(cacheKey);
     if (cachedResponse) return cachedResponse;
