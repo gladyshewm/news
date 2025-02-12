@@ -1,34 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NewsApiService } from './news-api.service';
-import { Cache } from 'cache-manager';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { RmqService } from '@app/rmq';
 import { HttpService } from '@nestjs/axios';
-import {
-  TrendingTopicDto,
-  TrendingTopicsPayload,
-} from '../dto/trending-topic.dto';
 import { RmqContext } from '@nestjs/microservices';
+import { SearchArticlesPayload } from '../dto/search-articles-payload.dto';
+import { SearchPublishersPayload } from '../dto/search-publishers-payload.dto';
+import { DataFetcherService } from '../data-fetcher/data-fetcher.service';
 import {
   SearchArticlesDto,
-  SearchArticlesPayload,
-} from '../dto/search-articles-payload.dto';
-import {
   SearchPublishersDto,
-  SearchPublishersPayload,
-} from '../dto/search-publishers-payload.dto';
+  SupportedTopicsDto,
+  TrendingTopicDto,
+} from '@app/shared';
+import { TrendingTopicsPayload } from '../dto/trending-topics-payload.dto';
+
+jest.mock('../data-fetcher/data-fetcher.service');
 
 describe('NewsApiService', () => {
   let newsApiService: NewsApiService;
-  let cacheManager: jest.Mocked<Cache>;
+  let dataFetcherService: jest.Mocked<DataFetcherService>;
   let rmqService: jest.Mocked<RmqService>;
   let httpService: jest.Mocked<HttpService>;
 
-  const mockCacheManager = {
-    get: jest.fn(),
-    set: jest.fn(),
-    del: jest.fn(),
-  };
   const mockRmqService = {
     ack: jest.fn(),
   };
@@ -43,10 +36,7 @@ describe('NewsApiService', () => {
       controllers: [],
       providers: [
         NewsApiService,
-        {
-          provide: CACHE_MANAGER,
-          useValue: mockCacheManager,
-        },
+        DataFetcherService,
         {
           provide: RmqService,
           useValue: mockRmqService,
@@ -59,7 +49,8 @@ describe('NewsApiService', () => {
     }).compile();
 
     newsApiService = app.get<NewsApiService>(NewsApiService);
-    cacheManager = app.get<jest.Mocked<Cache>>(CACHE_MANAGER);
+    dataFetcherService =
+      app.get<jest.Mocked<DataFetcherService>>(DataFetcherService);
     rmqService = app.get<jest.Mocked<RmqService>>(RmqService);
     httpService = app.get<jest.Mocked<HttpService>>(HttpService);
   });
@@ -71,281 +62,207 @@ describe('NewsApiService', () => {
   });
 
   describe('getTrendingTopics', () => {
-    let trendingTopics: TrendingTopicDto[];
-    const topics = [
-      {
-        title: 'test_test_test',
-        language: 'language',
-      },
-      {
-        title: 'test_test_test',
-        language: 'language',
-      },
-    ] as TrendingTopicDto[];
+    let result: TrendingTopicDto[];
+    const topics: TrendingTopicDto[] = [];
     const topic = 'General';
-    const language = 'language';
+    const language = 'en';
+    const country = 'us';
 
     beforeEach(async () => {
       jest
         .spyOn(httpService.axiosRef, 'get')
         .mockResolvedValue({ data: { data: topics } });
-      trendingTopics = await newsApiService.getTrendingTopics(topic, language);
+      result = await newsApiService.getTrendingTopics(topic, language, country);
     });
 
     it('should call httpService.axiosRef.get', async () => {
       expect(httpService.axiosRef.get).toHaveBeenCalledWith('/trendings', {
-        params: { topic, language },
+        params: { topic, language, country },
       });
     });
 
-    it('should return trending topics', async () => {
-      trendingTopics.forEach((t) => {
-        expect(t).toHaveProperty('topicId', topic);
+    it('should return a list of trending topics', async () => {
+      result.forEach((t) => {
+        expect(t.topicId).toBeDefined();
+        expect(t.language).toBeDefined();
+        expect(t.country).toBeDefined();
       });
-      expect(trendingTopics).toEqual(topics);
     });
 
     it('should throw an error if httpService.axiosRef.get throws an error', async () => {
       jest.spyOn(httpService.axiosRef, 'get').mockRejectedValue(new Error());
       await expect(
-        newsApiService.getTrendingTopics(topic, language),
+        newsApiService.getTrendingTopics(topic, language, country),
       ).rejects.toThrow(Error);
     });
   });
 
+  describe('fetchTrendingTopics', () => {
+    const topicsList: SupportedTopicsDto[] = [
+      'Business',
+      'Entertainment',
+      'General',
+      'Health',
+      'Lifestyle',
+      'Politics',
+      'Science',
+      'Sports',
+      'Technology',
+      'World',
+    ];
+
+    beforeEach(async () => {
+      jest
+        .spyOn(httpService.axiosRef, 'get')
+        .mockResolvedValue({ data: { data: [] as TrendingTopicDto[] } });
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should call dataFetcherService.saveTopics', async () => {
+      const spy = jest.spyOn(newsApiService, 'getTrendingTopics');
+
+      await newsApiService.fetchTrendingTopics();
+
+      for (const topic of topicsList) {
+        expect(spy).toHaveBeenCalledWith(topic, 'en');
+        expect(dataFetcherService.saveTopics).toHaveBeenCalledWith([]);
+      }
+    });
+  });
+
   describe('trendingTopics', () => {
-    let trendingTopics: TrendingTopicDto[];
-    const topics = [
-      {
-        title: 'test_test_test',
-        language: 'language',
-      },
-      {
-        title: 'test_test_test',
-        language: 'language',
-      },
-    ] as TrendingTopicDto[];
+    let result: TrendingTopicDto[];
+    const topics: TrendingTopicDto[] = [];
     const payload: TrendingTopicsPayload = {
       topic: 'General',
-      language: 'language',
+      language: 'en',
+      country: 'us',
     };
-    const context = {} as RmqContext;
+    const ctx = {} as RmqContext;
 
     beforeEach(async () => {
       jest
         .spyOn(httpService.axiosRef, 'get')
         .mockResolvedValue({ data: { data: topics } });
-      trendingTopics = await newsApiService.trendingTopics(payload, context);
     });
 
     it('should call getTrendingTopics', async () => {
       const spy = jest.spyOn(newsApiService, 'getTrendingTopics');
-      await newsApiService.trendingTopics(payload, context);
-      expect(spy).toHaveBeenCalledWith(payload.topic, payload.language);
+      await newsApiService.trendingTopics(payload, ctx);
+      expect(spy).toHaveBeenCalledWith(
+        payload.topic,
+        payload.language,
+        payload.country,
+      );
     });
 
-    it('should return trending topics', async () => {
-      trendingTopics.forEach((t) => {
-        expect(t).toHaveProperty('topicId', payload.topic);
-      });
-      expect(trendingTopics).toEqual(topics);
-    });
+    it('should return a list of trending topics', async () => {
+      jest.spyOn(newsApiService, 'getTrendingTopics').mockResolvedValue(topics);
+      result = await newsApiService.trendingTopics(payload, ctx);
 
-    it('should call rmqService.ack', async () => {
-      expect(rmqService.ack).toHaveBeenCalledWith(context);
+      expect(result).toEqual(topics);
     });
 
     it('should throw an error if getTrendingTopics throws an error', async () => {
       jest
         .spyOn(newsApiService, 'getTrendingTopics')
         .mockRejectedValue(new Error());
-      await expect(
-        newsApiService.trendingTopics(payload, context),
-      ).rejects.toThrow(Error);
+      await expect(newsApiService.trendingTopics(payload, ctx)).rejects.toThrow(
+        Error,
+      );
+    });
+
+    it('should call rmqService.ack', async () => {
+      await newsApiService.trendingTopics(payload, ctx);
+      expect(rmqService.ack).toHaveBeenCalledWith(ctx);
     });
   });
 
   describe('searchArticles', () => {
-    let searchArticles: SearchArticlesDto[];
-    const articles = [] as SearchArticlesDto[];
+    let result: SearchArticlesDto[];
     const payload: SearchArticlesPayload = { query: 'query', language: 'en' };
-    const context = {} as RmqContext;
-    let httpServiceSpy: jest.SpyInstance;
+    const ctx = {} as RmqContext;
 
     beforeEach(async () => {
-      httpServiceSpy = jest
-        .spyOn(httpService.axiosRef, 'get')
-        .mockResolvedValue({ data: { data: articles } });
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it('should call getCacheKeySearchArticles', async () => {
-      const spy = jest.spyOn<any, any>(
-        newsApiService,
-        'getCacheKeySearchArticles',
-      );
-      await newsApiService.searchArticles(payload, context);
-      expect(spy).toHaveBeenCalledWith(payload.query, payload.language);
-    });
-
-    it('should call getArticlesFromCache with cacheKey', async () => {
-      const spy = jest.spyOn<any, any>(newsApiService, 'getArticlesFromCache');
-      await newsApiService.searchArticles(payload, context);
-      expect(spy).toHaveBeenCalledWith(expect.any(String));
-    });
-
-    it('should return cached articles if it exists', async () => {
       jest
-        .spyOn<any, any>(newsApiService, 'getArticlesFromCache')
-        .mockResolvedValue(['cached']);
-      searchArticles = await newsApiService.searchArticles(payload, context);
-      expect(searchArticles).toEqual(['cached']);
-      expect(httpServiceSpy).not.toHaveBeenCalled();
+        .spyOn(httpService.axiosRef, 'get')
+        .mockResolvedValue({ data: { data: [] as SearchArticlesDto[] } });
+      result = await newsApiService.searchArticles(payload, ctx);
     });
 
-    describe('when cache does not exist', () => {
-      beforeEach(async () => {
-        jest
-          .spyOn<any, any>(newsApiService, 'getArticlesFromCache')
-          .mockResolvedValue(null);
-        searchArticles = await newsApiService.searchArticles(payload, context);
-      });
-
-      it('should call httpService.axiosRef.get', async () => {
-        expect(httpServiceSpy).toHaveBeenCalledWith('/search/articles', {
+    it('should call httpService.axiosRef.get', async () => {
+      expect(httpService.axiosRef.get).toHaveBeenCalledWith(
+        '/search/articles',
+        {
           params: { query: payload.query, language: payload.language },
-        });
-      });
+        },
+      );
+    });
 
-      it('should call cacheManager.set', async () => {
-        expect(cacheManager.set).toHaveBeenCalledWith(
-          expect.any(String),
-          articles,
-          expect.any(Number),
-        );
-      });
+    it('should return a list of search articles', async () => {
+      expect(result).toEqual([]);
+    });
 
-      it('should return articles', async () => {
-        expect(searchArticles).toEqual(articles);
-      });
+    it('should throw an error if httpService.axiosRef.get throws an error', async () => {
+      jest.spyOn(httpService.axiosRef, 'get').mockRejectedValue(new Error());
+      await expect(newsApiService.searchArticles(payload, ctx)).rejects.toThrow(
+        Error,
+      );
+    });
 
-      it('should call rmqService.ack', async () => {
-        expect(rmqService.ack).toHaveBeenCalledWith(context);
-      });
-
-      it('should throw an error if httpService.axiosRef.get throws an error', async () => {
-        httpServiceSpy.mockRejectedValue(new Error());
-        await expect(
-          newsApiService.searchArticles(payload, context),
-        ).rejects.toThrow(Error);
-      });
+    it('should call rmqService.ack', async () => {
+      await newsApiService.searchArticles(payload, ctx);
+      expect(rmqService.ack).toHaveBeenCalledWith(ctx);
     });
   });
 
   describe('searchPublishers', () => {
-    let searchPublishers: SearchPublishersDto[];
-    const publishers = [] as SearchPublishersDto[];
+    let result: SearchPublishersDto[];
     const payload: SearchPublishersPayload = {
       query: 'query',
       country: 'country',
       language: 'en',
       category: 'category',
     };
-    const context = {} as RmqContext;
-    let httpServiceSpy: jest.SpyInstance;
+    const ctx = {} as RmqContext;
 
     beforeEach(async () => {
-      httpServiceSpy = jest
-        .spyOn(httpService.axiosRef, 'get')
-        .mockResolvedValue({ data: { data: publishers } });
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it('should call getCacheKeySearchPublishers', async () => {
-      const spy = jest.spyOn<any, any>(
-        newsApiService,
-        'getCacheKeySearchPublishers',
-      );
-      await newsApiService.searchPublishers(payload, context);
-      expect(spy).toHaveBeenCalledWith(
-        payload.query,
-        payload.language,
-        payload.country,
-        payload.category,
-      );
-    });
-
-    it('should call getPublishersFromCache with cacheKey', async () => {
-      const spy = jest.spyOn<any, any>(
-        newsApiService,
-        'getPublishersFromCache',
-      );
-      await newsApiService.searchPublishers(payload, context);
-      expect(spy).toHaveBeenCalledWith(expect.any(String));
-    });
-
-    it('should return cached publishers if it exists', async () => {
       jest
-        .spyOn<any, any>(newsApiService, 'getPublishersFromCache')
-        .mockResolvedValue(['cached']);
-      searchPublishers = await newsApiService.searchPublishers(
-        payload,
-        context,
-      );
-      expect(searchPublishers).toEqual(['cached']);
-      expect(httpServiceSpy).not.toHaveBeenCalled();
+        .spyOn(httpService.axiosRef, 'get')
+        .mockResolvedValue({ data: { data: [] as SearchPublishersDto[] } });
+      result = await newsApiService.searchPublishers(payload, ctx);
     });
 
-    describe('when cache does not exist', () => {
-      beforeEach(async () => {
-        jest
-          .spyOn<any, any>(newsApiService, 'getPublishersFromCache')
-          .mockResolvedValue(null);
-        searchPublishers = await newsApiService.searchPublishers(
-          payload,
-          context,
-        );
-      });
-
-      it('should call httpService.axiosRef.get', async () => {
-        expect(httpServiceSpy).toHaveBeenCalledWith('/search/publishers', {
+    it('should call httpService.axiosRef.get', async () => {
+      expect(httpService.axiosRef.get).toHaveBeenCalledWith(
+        '/search/publishers',
+        {
           params: {
             query: payload.query,
             country: payload.country,
             language: payload.language,
             category: payload.category,
           },
-        });
-      });
+        },
+      );
+    });
 
-      it('should call cacheManager.set', async () => {
-        expect(cacheManager.set).toHaveBeenCalledWith(
-          expect.any(String),
-          publishers,
-          expect.any(Number),
-        );
-      });
+    it('should return a list of search publishers', async () => {
+      expect(result).toEqual([]);
+    });
 
-      it('should return publishers', async () => {
-        expect(searchPublishers).toEqual(publishers);
-      });
+    it('should throw an error if httpService.axiosRef.get throws an error', async () => {
+      jest.spyOn(httpService.axiosRef, 'get').mockRejectedValue(new Error());
+      await expect(
+        newsApiService.searchPublishers(payload, ctx),
+      ).rejects.toThrow(Error);
+    });
 
-      it('should call rmqService.ack', async () => {
-        expect(rmqService.ack).toHaveBeenCalledWith(context);
-      });
-
-      it('should throw an error if httpService.axiosRef.get throws an error', async () => {
-        httpServiceSpy.mockRejectedValue(new Error());
-        await expect(
-          newsApiService.searchPublishers(payload, context),
-        ).rejects.toThrow(Error);
-      });
+    it('should call rmqService.ack', async () => {
+      expect(rmqService.ack).toHaveBeenCalledWith(ctx);
     });
   });
 });
