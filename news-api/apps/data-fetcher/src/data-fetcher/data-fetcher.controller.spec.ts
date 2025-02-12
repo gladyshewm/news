@@ -2,20 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DataFetcherController } from './data-fetcher.controller';
 import { DataFetcherService } from './data-fetcher.service';
 import { NewsApiService } from '../news-api/news-api.service';
-import {
-  TrendingTopicDto,
-  TrendingTopicsPayload,
-} from '../dto/trending-topic.dto';
 import { RmqContext } from '@nestjs/microservices';
-import { DataFetcherResponseDto } from '../dto/data-fetcher-response.dto';
 import {
   SearchArticlesDto,
-  SearchArticlesPayload,
-} from '../dto/search-articles-payload.dto';
-import {
   SearchPublishersDto,
-  SearchPublishersPayload,
-} from '../dto/search-publishers-payload.dto';
+  ServiceResponseDto,
+  TrendingTopicDto,
+} from '@app/shared';
+import { TrendingTopicsPayload } from '../dto/trending-topics-payload.dto';
+import { SearchArticlesPayload } from '../dto/search-articles-payload.dto';
+import { SearchPublishersPayload } from '../dto/search-publishers-payload.dto';
 
 jest.mock('./data-fetcher.service');
 jest.mock('../news-api/news-api.service');
@@ -86,7 +82,7 @@ describe('DataFetcherController', () => {
 
   describe('Events', () => {
     describe('trendingTopics', () => {
-      let result: DataFetcherResponseDto<TrendingTopicDto[]>;
+      let result: ServiceResponseDto<TrendingTopicDto[]>;
       const topics: TrendingTopicDto[] = [];
       const payload: TrendingTopicsPayload = {
         topic: 'General',
@@ -130,7 +126,7 @@ describe('DataFetcherController', () => {
     });
 
     describe('searchArticles', () => {
-      let result: DataFetcherResponseDto<SearchArticlesDto[]>;
+      let result: ServiceResponseDto<SearchArticlesDto[]>;
       const articles: SearchArticlesDto[] = [];
       const payload: SearchArticlesPayload = { query: 'query', language: 'en' };
       const ctx = {} as RmqContext;
@@ -167,7 +163,7 @@ describe('DataFetcherController', () => {
     });
 
     describe('searchPublishers', () => {
-      let result: DataFetcherResponseDto<SearchPublishersDto[]>;
+      let result: ServiceResponseDto<SearchPublishersDto[]>;
       const publishers: SearchPublishersDto[] = [];
       const payload: SearchPublishersPayload = {
         query: 'query',
