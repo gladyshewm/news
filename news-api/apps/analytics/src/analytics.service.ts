@@ -260,7 +260,10 @@ export class AnalyticsService implements OnModuleInit {
     }
   }
 
-  async topAuthors(payload: TopAuthorsPayload, context: RmqContext) {
+  async topAuthors(
+    payload: TopAuthorsPayload,
+    context: RmqContext,
+  ): Promise<AuthorStatsDto[]> {
     const { limit } = payload;
     try {
       const authors = await this.getTopAuthors(limit);
